@@ -2821,6 +2821,7 @@
                   });
                 },
                 refresh:function(){
+                  console.log("refresh")
                   this.loadingRefresh =true;
                   location.reload();
                 },
@@ -3371,7 +3372,6 @@
                             returncode = 501;
                           }
                         }
-                        self.refresh()
                       },
                       error:function(XMLHttpRequest, textStatus, errorThrown){
                         returncode = 502;
@@ -3892,6 +3892,7 @@
                 }else{
                   self.printtest = false;
                 }
+                  self.refresh()
               };
               window.addEventListener("visibilitychange",()=>{
                 if(document.hidden && self.websocketSuccess && self.deliverCompanyId){
