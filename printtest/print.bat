@@ -1,0 +1,1 @@
+start chrome.exe --kiosk --kiosk-printing "http://api.mytongche.com/printtest/print.html"

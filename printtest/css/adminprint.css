@@ -1,0 +1,458 @@
+@media print,screen{
+  body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre, form, fieldset, legend, button, input, textarea, th, td { margin:0; padding:0; }
+  body, button, input, select, textarea div{ font: 16px,宋体,"PingFangSC-Semibold,PingFang SC", \5b8b\4f53; }
+  h1, h2, h3, h4, h5, h6{ font-size:100%; }
+  address, cite, dfn, em, var { font-style:normal; }
+  code, kbd, pre, samp { font-family:couriernew, courier, monospace; }
+  small{ font-size:12px; }
+  ul, ol { list-style:none; }
+  a { text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  sup { vertical-align:text-top; }
+  sub{ vertical-align:text-bottom; }
+  legend { color:#000; }
+  fieldset, img { border:0; }
+  button, input, select, textarea { font-size:100%; }
+  table { border-collapse:collapse; border-spacing:0; }
+  
+  .no-print{
+    display:none;
+  }
+  .pagenext   
+  {   
+    page-break-after:always;
+  } 
+  .pageavoid{
+    page-break-inside: avoid
+  }
+  nav, aside {
+      display: none;
+  }
+  body, article {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+ }
+
+  @page{
+    /* size: portrait; */
+    /* size:110mm auto; */
+    size: 110mm 100% ;
+    margin: 3mm 0mm 0mm 0mm;
+    /* marks: crop;
+    bleed: 1cm; */
+
+    /* width: 110mm;
+    height: 9cm; */
+    /* margin:0; */
+    
+  }
+  
+
+  body {
+    color: #000;
+    background: #DBDBDB;
+  }
+
+  .fl{
+    float: left;
+  }
+
+  .fr{
+    float: right;
+  }
+
+  .f10{
+    font-size:10px;
+  }
+  .f11{
+    font-size:11px;
+  }
+  .f14{
+    font-size:14px;
+  }
+  .f15{
+    font-size:15px;
+  }
+  .f17{
+    font-size:17px;
+  }
+  .f19{
+    font-size:19px;
+  }
+  .f24{
+    font-size:24px;
+
+  }
+  .lh20{
+    line-height:20px;
+  }
+
+  .lh27{
+    line-height:27px;
+  }
+  .lh34{
+    line-height: 34px;
+  }
+
+  .fw600{
+    font-weight:600;
+  }
+  .fw400{
+    font-weight:400;
+  }
+
+  .pl11{
+    padding-left: 11px;
+  }
+  .pl12{
+    padding-left: 12px;
+  }
+
+  
+  .pt10{
+    padding-top: 10px;
+  }
+
+  .printbox{
+    width: 100%;
+    height: 100%;
+  }
+
+  .projectbox{
+    width:567px;
+    min-height:415px;
+    background:rgba(255,255,255,1);
+    height: auto;
+    margin-bottom: 0px;
+  }
+
+  .mixbox{
+    min-height: 495px;
+    width: 567px;
+    height: auto;
+    background:rgba(255,255,255,1);
+
+  }
+
+  .pumpbox{
+    min-height: 319px;
+    width: 567px;
+    height: auto;
+    background:rgba(255,255,255,1);
+
+    /* height: auto; */
+  }
+
+  .header {
+    padding: 5px 10px 7px;
+
+  }
+  .header .logo-container {
+    width: 318px;
+  }
+  .logo-container .mix-name{
+    font-size: 15px;
+    font-weight:400;
+    line-height:35px;
+  }
+  .item-order-no{
+    line-height: 22px;
+    font-weight: 600;
+  }
+  .print-time {
+    /* line-height:34px ; */
+  }
+  .tickettag{
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  .header .barcode img{
+    width: 66px;
+    height: 66px;
+    background-color: #000;
+  }
+  .header .company {
+    font-size: 21px;
+    line-height: 30px;
+    font-weight: 500;
+    padding-left: 5px;
+  }
+  .header .logo img{
+    vertical-align: text-bottom;
+  }
+  .basic-info {
+    width: 100%;
+    height: 54px;
+    -webkit-print-color-adjust: exact;
+  }
+  .basic-info li {
+    float: left;
+    height: inherit;
+    border-left: 1px solid #000;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+
+    text-align: center;
+  }
+
+  .basic-info li:first-child {
+    border-left: 0px;
+  }
+  .basic-info li .title {
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .basic-info li .content {
+    font-size: 33px;
+    font-weight: 500;
+    line-height: 33px;
+  }
+  .basic-info .fhquantity {
+    width: 82.89px;
+  }
+  .basic-info .cartimes {
+    width: 80.68px;
+  }
+  .basic-info .counts {
+    width: 118.26px;
+  }
+  .basic-info .counts .content {
+    font-size:21px;
+  }
+  .basic-info .part {
+    width: 277.84px;
+    text-align: left;
+    line-height: 22px;  
+  }
+  .basic-info .part span {
+    display: inline-block;
+    width: 95%;
+    padding-left: 4%;
+  }
+  .basic-info .part .title {
+    font-size: 21px;
+    line-height: 29px;
+    font-weight: 500;
+  }
+  .basic-info .part .content {
+    font-size: 16px;
+    line-height: 23px;
+  }
+  .detail {
+    font-size: 16px;
+    padding: 9px;
+    border-bottom: 1px solid #000;
+  }
+  .detail:last-child {
+    /* border-bottom: 1.69px dashed #000; */
+    border-bottom:0;
+  }
+  .detail span {
+    display: block;
+    line-height: 22px;
+  }
+  .detail em{
+    text-align: justify;
+    text-align-last:justify;
+    display: inline-block;
+  }
+  .projectbox .detail em,.mixbox .detail em{
+    width: 67px;
+  }
+  .pumpbox .detail em{
+    width: 82px;
+  }
+  .detail .company, .detail .contact, .detail .carnumber, .detail .driver, .detail .address, .detail .sign , .detail .remark,.detail .taskno, .detail .createtime, .detail .mixtable, .detail .fhy {
+    width: 50%;
+    float: left;
+  }
+  .detail .sign , .detail .remark{
+    height: 45px;
+    line-height:45px;
+  }
+  .pumpbox .detail{
+    border-top: 1px solid #000;
+  }
+
+  .welcome{
+    height: 100%;
+    width: 100%;
+    background-color: #DBDBDB;
+  }
+  .cf {
+    clear: both
+  }
+  .cf::after{
+    content: "";
+    display: block;
+    clear: both;
+  }
+  .loadingbox{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background: #DBDBDB;
+    opacity: 1;
+    top: 0;
+    left: 0;
+    color: gray;
+  }
+  .scan-ok{
+    font-size: 50px;
+    padding-bottom: 10%;
+    padding-top: 20%;
+  }
+  .detail .remark-bigger{
+    font-size:36px;
+    font-weight:500;
+    line-height: 50px;
+    display: inline;
+  }
+}
+/* @media print{
+  .hide{
+    display: block;
+  }
+} */
+@media screen{
+  .no-print{
+    display: block;
+  }
+  .hide{
+    display: none;
+  }
+
+  .inputbox{
+    height: 100px;
+    padding-top: 30px;
+  }
+  .errorMsg{
+    color: #FFFFFF;
+    font-size: 22px;
+    font-weight: 400;
+    position: absolute;
+    bottom: 82px;
+    background-color: #1f57b3;
+    border-radius: 25px;
+    width: 60%;
+    margin: 0 auto;
+    text-align: center;
+    left: 20%;
+    height: 50px;
+    line-height: 50px;
+  }
+  
+  .step{
+      width: 120px;
+      float: left;
+      padding-top: 45px;
+  }
+  .step img{
+      width: 95px;
+  }
+  .steptext{
+      width: 240px;
+      float: left;
+  }
+  .steptext .title{
+      font-weight: 600;
+      font-size: 24px;
+      height: 32px;
+  }
+  .steptext .tip{
+      font-size: 14px;
+  }
+  .time{
+      width: 200px;
+      float: right;
+      padding-right: 50px;
+  }
+  .time .timebox{
+      font-size: 14px;
+      padding-top: 38px;
+  }
+  .time .timebox img{
+      width: 16px;
+      padding-right: 13px;
+      padding-top: 3px;
+      float: left;
+  }
+  .time .timebox .timetext{
+      font-size: 16px;
+      font-weight: 600;
+  }
+  .stepbody{
+      text-align: center;
+  }
+  .stepbody img{
+      width: 50%;
+      padding-bottom: 120px;
+  }
+  .stepbottom{
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing:10px;
+      padding-left: 38px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+  }
+  .stepbottom .text{
+      float: left;
+  }
+  .stepbottom .img{
+      padding-top: 2px;
+  }
+  .stepbottom .img img{
+      height: 18px;
+      padding-left: 20px;
+  }
+
+  .loading img{
+    height: 120px;
+    width: 120px;
+    border-radius: 60px;
+  }
+
+  .loading-animate{
+    width: 80px;
+    height: 40px;
+    margin: 0 auto;
+    margin-top:100px;
+  }
+  .loading-animate span{
+      display: inline-block;
+      width: 8px;
+      height: 100%;
+      border-radius: 4px;
+      background: #1f57b3;
+      /* -webkit-animation: load 1s ease infinite; */
+  }
+  /* @-webkit-keyframes load{
+      0%,100%{
+          height: 40px;
+          background: #1f57b3;
+      }
+      50%{
+          height: 70px;
+          margin: -15px 0;
+          background: #1f57b3;
+      }
+  }
+  .loading-animate span:nth-child(2){
+      -webkit-animation-delay:0.2s;
+  }
+  .loading-animate span:nth-child(3){
+      -webkit-animation-delay:0.4s;
+  }
+  .loading-animate span:nth-child(4){
+      -webkit-animation-delay:0.6s;
+  }
+  .loading-animate span:nth-child(5){
+      -webkit-animation-delay:0.8s;
+  } */
+
+
+
+}

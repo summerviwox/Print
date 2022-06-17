@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="80188879-5a5e-464b-afe1-b194bf459b34" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ProjectId" id="2AbIAQLQqnmdHegYPEaohdeib2p" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunManager">
+    <configuration name="print.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/public/printtest/print.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.print.html" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="80188879-5a5e-464b-afe1-b194bf459b34" name="Default Changelist" comment="" />
+      <created>1655271713475</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1655271713475</updated>
+      <workItem from="1655271714537" duration="12765000" />
+      <workItem from="1655358074079" duration="22000" />
+      <workItem from="1655358680865" duration="6418000" />
+      <workItem from="1655367517033" duration="1057000" />
+      <workItem from="1655453515885" duration="452000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1001" y="261" width="540" height="524" key="StructurePopup" timestamp="1655365768505">
+      <screen x="0" y="0" width="2560" height="1040" />
+    </state>
+    <state x="1001" y="261" width="540" height="524" key="StructurePopup/0.0.2560.1040/-1920.201.1920.1040@0.0.2560.1040" timestamp="1655365768505" />
+    <state x="92" y="92" width="2376" height="856" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog" timestamp="1655361084924">
+      <screen x="0" y="0" width="2560" height="1040" />
+    </state>
+    <state x="92" y="92" width="2376" height="856" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog/0.0.2560.1040/-1920.201.1920.1040@0.0.2560.1040" timestamp="1655361084924" />
+    <state x="92" y="92" width="2376" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1655363941429">
+      <screen x="0" y="0" width="2560" height="1040" />
+    </state>
+    <state x="92" y="92" width="2376" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.2560.1040/-1920.201.1920.1040@0.0.2560.1040" timestamp="1655363941429" />
+  </component>
+</project>

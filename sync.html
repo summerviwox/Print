@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据交互</title>
+    <script src="printtest/js/jquery-2.1.0.min.js"></script>
+</head>
+<style>
+    table {
+        /*定义为弹性布局*/
+        display: flex;
+        /*垂直居中*/
+        align-items: center;
+        /*水平居中*/
+        justify-content: center;
+        margin: 20px 0;
+        padding: 10px;
+    }
+</style>
+<body>
+
+<table id='table-test'>
+    <tr>
+        <th>页数</th>
+        <th>执行结果</th>
+    </tr>
+</table>
+
+</body>
+<script>
+    var page = 1;
+    //假设每隔30秒发送一次请求
+    window.onload = function () {
+        getApi();
+    }
+
+    function getApi() {
+        page++;
+        //设置时间30秒
+        setTimeout(getApi, 20 * 1000);
+        //getsyncinitcustomer  同步泰山CRM初始化客户
+        //getsyncinitcontacts  同步泰山CRM初始化联系人
+        $.post('https://api.mytongche.com/tool/getsyncinitcontacts',
+            {
+                'token': 123,
+                'page': page,
+                'pagesize': 50,
+            },
+            function (res) {
+                if (res.code == 200) {
+                    var tr;
+                    tr = '<td>' + page + '</td>' + '<td>' + res.message + '</td>';
+                    $('#table-test').append('<tr>' + tr + '</tr>')
+                }
+            }, 'json');
+    }
+</script>
+</html>

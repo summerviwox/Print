@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+  <html>
+    <head lang="en">
+      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+      <title>砼行_混凝土物流管理专家</title>
+      <link href="images/favicon.ico" rel="shortcut icon" />
+      <!-- <link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.0/lib/theme-chalk/index.css"> -->
+      <link rel="stylesheet" href="css/ele.css" type="text/css" />
+      <link rel="stylesheet" href="css/qs.css" type="text/css" />
+      <script src="js/vue.js"></script>
+      <script src="js/ele.js"></script>
+      <script src="js/axios.js"></script>
+      <!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
+      <!-- <script src="https://unpkg.com/element-ui@2.13.0/lib/index.js"></script> -->
+    </head>
+    <body>
+    <div id="app">
+        <el-container>
+            <el-header height="110px">
+                    <el-row class="search-box demo-autocomplete">
+                        <el-col :span="24"> 
+                          <el-input
+                            :placeholder="placeholder"
+                            prefix-icon="el-icon-search"
+                            v-model="searchValue"
+                            @change="handleSearch"
+                            clearable=true
+                          >
+                          </el-input>
+                        </el-col>
+                    </el-row>
+                    <el-row class="menu">
+                        <el-col :span="20" :offset="2">
+                            <el-menu :default-active="activeIndex" mode="horizontal" @select="handleSelect" background-color="#1F57B3" text-color="#A6C4EF" active-text-color="#FFFFFF" menu-trigger="click" collapse-transition="false">
+                                <el-menu-item index="1" class="el-col-10" style="background-color: #1F57B3">搅拌站</el-menu-item>
+                                <div class="el-col-4 empty" disabled></div>
+                                <el-menu-item index="2" class="el-col-10" style="background-color: #1F57B3">工程项目</el-menu-item>
+                            </el-menu>
+                        </el-col>
+                    </el-row>
+            </el-header>
+            <el-main>
+                <div class="company-infos" v-show="activeIndex == 1">
+                  <div class="square-container">
+                          <div class="square-tab" :class="{'is-active':activeSubIndex == 1}" @click="handleSubSelect(1)">
+                              <div class="title">配比调整</div>
+                              <div class="value">{{phbChange}}</div>
+                          </div>
+                          <div class="square-tab" :class="{'is-active':activeSubIndex == 2}" @click="handleSubSelect(2)">
+                              <div class="title">全部拌站</div>
+                              <div class="value">{{allCompanyCount}}</div>
+                          </div>
+                  </div>
+                  <div class="infinite-list-wrapper">
+                    <div class="companylist" ref="companylist" @scroll="onScroll" v-infinite-scroll="loadcompany" infinite-scroll-disabled="companyDisabled" infinite-scroll-immediate="false" style="overflow:auto" :style="{'height': companylistheight + 'px'}" >
+                        <div class="company-box" v-for="(item,i) in companylist">
+                            <div class="title">
+                                <span class="el-col-20 company-subname">{{item.companySubName}}</span><span  class="el-col-4" :class="item.onwork == 1 ? 'onwork' : 'offwork'">{{item.onwork == 1 ? '开工':'未开工'}}</span>
+                            </div>
+                            <div><span class="company-name">全称:&nbsp;{{item.companyName}}</span></div>
+                            <div><span class="company-address">地址:&nbsp;{{item.address}}</span></div>
+                            <div><span class="company-address">联系人:&nbsp;{{item.linkMan}}&nbsp;{{item.linkTel}}</span></div>
+                        </div>
+                        <p class="loading" v-if="companyLoading">加载中</p>
+                        <p class="bottom-line" v-if="companyNoMore">——我是有底线的——</p>
+                    </div>
+                   
+                </div>
+                </div>
+                <div class="project-infos" v-show="activeIndex == 2">
+                    <div class="square-container">
+                      <div class="square-tab" :class="{'is-active':activeSubIndex == 1}" @click="handleSubSelect(1)" subIndex="1">
+                          <div class="title">质量预警</div>
+                          <div class="value">{{phbAbnormalCount}}</div>
+                      </div>
+                      <div class="square-tab" :class="{'is-active':activeSubIndex == 2}" @click="handleSubSelect(2)" subIndex="2">
+                          <div class="title">今日开工</div>
+                          <div class="value">{{todayOnWork}}</div>
+                      </div>
+                      <div class="square-tab" :class="{'is-active':activeSubIndex == 3}" @click="handleSubSelect(3)" subIndex="3">
+                          <div class="title">全部工程</div>
+                          <div class="value">{{allProjectCount}}</div>
+                      </div>
+                    </div>
+                    <div class="projectlist" ref="projectlist" @scroll="onScroll" v-infinite-scroll="loadproject" infinite-scroll-disabled="projectDisabled" infinite-scroll-immediate="false" style="overflow:auto" :style="{'height': projectlistheight + 'px'}">
+                        <div class="project-box" v-for="(pitem,i) in projectlist">
+                            <div class="title cf">
+                                <span class="el-col-20 project-name">{{pitem.projectName}}</span>
+                                <span  class="el-col-4" :class="pitem.onwork == 1 ? 'onwork' : 'offwork'">{{pitem.onwork == 1 ? '开工':"未开工"}}</span>
+                            </div>
+                            <div><span class="company-name">搅拌站:{{pitem.deliverCompanyName}}</span></div>
+                            <div><span class="receiver-company-name">施工方:{{pitem.receiverCompanyName}}</span></div>
+
+                            <div class="tag" v-if="pitem.abnormalTab">
+                                <el-tag class="phb-warning" v-for="(item2,i2) in pitem.abnormalTab">{{item2}}</el-tag>
+                            </div>
+                        </div>
+                        <p class="loading"  v-if="projectLoading">加载中</p>
+                        <p class="bottom-line" v-if="projectNoMore">——我是有底线的——</p>
+                      </div>
+                  </div>
+            </el-main>
+        </el-container>
+    </div>
+
+      <script type="text/javascript">
+        var vm = new Vue({
+            el: '#app',
+            data: {
+              activeIndex:"1",
+              activeSubIndex:1,
+              searchValue:"",
+              placeholder:"搜索拌站",
+              phbChange:0,
+              allCompanyCount:0,
+              companylistheight:document.documentElement.clientHeight-250 || document.body.clientHeight-250,
+              projectlistheight:document.documentElement.clientHeight-250 || document.body.clientHeight-250,
+              companylist:[],
+              phbAbnormalCount:0,
+              todayOnWork:0,
+              allProjectCount:0,
+              projectlist:[],
+              apihost:'http://'+window.location.host,
+              api:{
+                companiesinfoapi:'/qs/companiesinfo',
+                projectsinfoapi:'/qs/projectsinfo',
+              },
+              pagesize:10,
+              companyNoMore:false,
+              projectNoMore:false,
+              companyLoading: false,
+              projectLoading: false,
+            },
+            
+            computed:{
+              filterPhbCompanylist: function () {
+                return this.companylist.filter(function (item) 
+                {
+                  if(item.phbChanged == 1){
+                    return item;
+                  }
+                })
+              },             
+              companyDisabled () {
+                return this.companyLoading || this.companyNoMore;
+                // return this.companyNoMore;
+
+              },
+              projectDisabled () {
+                return this.projectLoading || this.projectNoMore;
+                // return this.projectNoMore;
+              }
+            },
+
+            watch: {
+             
+            },
+            methods: {
+              onScroll: function(){
+                let scrollTop;
+                if(this.activeIndex == 1){
+                  let scrollTop = this.$refs.companylist.scrollTop;
+                  if(scrollTop == 0){
+                    this.getcompanyinfos(0);
+                  }
+                }else if(this.activeIndex == 2){
+                  let scrollTop = this.$refs.projectlist.scrollTop;
+                  if(scrollTop == 0){
+                    this.getprojectinfos(0);
+                  }
+                }
+              },
+              handleSelect: function (tabIndex) {
+                this.activeIndex = tabIndex;
+                this.activeSubIndex = 1;
+                this.searchValue = '';
+                if(tabIndex == 1){
+                  this.placeholder = '搜索拌站';
+                  console.log(this.$refs.companylist.scrollTop);
+                  // this.$refs.companylist.scrollTop = 0;
+                  this.getcompanyinfos(0);
+                }else{
+                  this.placeholder = '搜索工程';
+                  console.log(this.$refs.projectlist.scrollTop);
+
+                  // this.$refs.projectlist.scrollTop = 0;
+                  this.getprojectinfos(0)
+                }
+              },
+              handleSearch(item) {
+                if(this.activeIndex == 1){
+                  this.getcompanyinfos(0);
+                  // this.$refs.companylist.scrollTop = 0;
+                }else if(this.activeIndex == 2){
+                  this.getprojectinfos(0);
+                  // this.$refs.projectlist.scrollTop = 0;
+                }
+              },
+              handleSubSelect: function (subIndex){
+                this.activeSubIndex = subIndex;
+                // this.searchValue = '';
+                if(this.activeIndex == 1){
+                  // company
+                  this.getcompanyinfos(0);
+                  // this.$refs.companylist.scrollTop = 0;
+                }else if(this.activeIndex == 2){
+                  this.getprojectinfos(0);
+                  // this.$refs.projectlist.scrollTop = 0;
+                }
+              },
+              loadcompany:function(){
+                if(this.companyDisabled){
+                  return false;
+                }
+                this.companyLoading = true;
+                let currentId = this.companylist[this.companylist.length-1]['currentId'];
+                this.getcompanyinfos(currentId);
+              },
+              loadproject:function(){
+                if(this.projectDisabled){
+                  return false;
+                }
+                this.projectLoading = true;
+                let currentId = this.projectlist[this.projectlist.length-1]['currentId'];
+                this.getprojectinfos(currentId);
+              },
+              getcompanyinfos:function(currentId){
+                let self = this;
+                let data = {
+                  "tab":self.activeSubIndex,
+                  "pagesize":self.pagesize,
+                  "currentId":currentId,
+                  "searchDirection":currentId == 0?1:2,
+                  "keyword":this.searchValue
+                };
+                axios({
+                  method: 'get',
+                  url: self.apihost+self.api.companiesinfoapi,
+                  params: data
+                }).then(function (res) {
+                  if(res.status == 200){
+                    let result = res.data;
+                    if(result.code == 200){
+                      self.phbChange = result.result.phbChangeCount;
+                      self.allCompanyCount = result.result.totalCompaniesCount;
+                      if(currentId == 0){
+                        self.companylist =  result.result.list;
+                        self.companyNoMore = false;
+                        self.companyLoading = false;
+                        self.$refs.companylist.scrollTop = 0;
+                      }else{
+                        if(result.result.list.length < self.pagesize){
+                          self.companyNoMore = true;
+                        }
+                        self.companylist =  self.companylist.concat(result.result.list);
+                        self.companyLoading = false;
+                      }
+                    }else{
+                    }
+                  }
+                  
+                });
+              },
+              getprojectinfos:function(currentId){
+                let self = this;
+                let data = {
+                  "tab":self.activeSubIndex,
+                  "pagesize":self.pagesize,
+                  "currentId":currentId,
+                  "searchDirection":currentId == 0?1:2,
+                  "keyword":this.searchValue
+                };
+                axios({
+                  method: 'get',
+                  url: self.apihost+self.api.projectsinfoapi,
+                  params: data
+                }).then(function (res) {
+                  if(res.status == 200){
+                    let result = res.data;
+                    if(result.code == 200){
+                      self.phbAbnormalCount = result.result.phbAbnormalCount;
+                      self.todayOnWork = result.result.todayOnWork;
+                      self.allProjectCount = result.result.allCount;
+
+                      if(currentId == 0){
+                        self.projectlist =  result.result.list;
+                        self.projectLoading = false;
+                        self.projectNoMore = false;
+                        self.$refs.projectlist.scrollTop = 0;
+                      }else{
+                        if(result.result.list.length < self.pagesize){
+                          self.projectNoMore = true;
+                        }
+                        self.projectlist =  self.projectlist.concat(result.result.list);
+                        self.projectLoading = false;
+                      }
+                    }else{
+
+                    }
+                  }
+                  
+                });
+
+              }
+
+          
+            },
+            mounted: function () {
+              this.getcompanyinfos(0);
+              // this.getprojectinfos(0);
+              this.$nextTick(function () {
+                // Code that will run only after the
+                // entire view has been rendered      console.log(window.frames[0])
+                // test
+                // var patt = new RegExp(/(TsT(?!.*?TsT).*?TeT)+?/g);
+                // var matchstr = this.pagedata.match(patt);
+                // this.pagedata =  matchstr[0].slice(3,-3);
+                // this.analysisData();   
+                // this.makeQrCode();
+             
+              })
+            },
+            created: function(){
+            },
+            beforeDestroy:function(){
+            },
+            destroyed() {
+            }
+        })
+    </script>
+  </body>
+
+</html>

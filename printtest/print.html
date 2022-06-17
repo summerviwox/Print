@@ -1,0 +1,4005 @@
+<!DOCTYPE html>
+  <html>
+    <head lang="en">
+      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+      <title>砼行_混凝土物流管理专家</title>
+      <link href="images/favicon.ico" rel="shortcut icon" />
+      <!-- <link rel="stylesheet" href="css/element.css"> -->
+      <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css"> -->
+
+      <link rel="stylesheet" href="css/simple-keyboard.css?v=1.1.0" type="text/css" />
+      <link rel="stylesheet" href="css/print.css?v=1.1.8" type="text/css" />
+      <link rel="stylesheet" href="css/keyboard.css?v=1.1.0" type="text/css" />
+
+
+
+      <script src="js/jquery-1.4.4.min.js"></script>
+      <script language="javascript" src="js/jquery.jqprint-0.3.js"></script>
+      <script language="javascript" src="js/qrcode.min.js"></script>
+      <script language="javascript" src="js/jquery.md5.js"></script>
+      <script language="javascript" src="js/gbk.js"></script>
+      <script language="javascript" src="js/pako.min.js"></script>
+      <script language="javascript" src="js/simple-keyboard.js"></script>
+      <!-- <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.min.js"></script> -->
+      <!-- <script src="js/index.js"></script> -->
+      <script src="js/vue.js"></script>
+      <!-- <script src="js/element.js"></script> -->
+
+    </head>
+    <body>
+      <div id="app">
+        <input type="text" id="testinput" ref="testinput" class="no-print" value="" style="width:0px;height:0px;border:none;"></input>
+        <div id = "jgprint" class="printbox">
+          <div id="errorMsg" ref="errorMsg" class="errorMsg no-print" v-show="errorMsg">{{errorMsg}}</div>
+          <div v-show="pageState == 0 && printerStatus == 1 && authStatus == 1" class="welcome no-print">
+            <div id="steptitle1" style="display: block;" ref="step1">
+              <div class="step">
+                <img src="images/step1.png">
+              </div>
+              <div class="steptext">
+                <div class="deviation title" style="padding-top: 45px;">进入小票详情页</div>
+                <div class="deviation title">打开签收码</div>
+                <div class="deviation tip" style="padding-top: 20px;">如遇打印问题请咨询客服</div>
+                <div class="deviation tip">400-680-0897</div>
+              </div>
+            </div>
+            <div id="steptitle2" style="display: none;" ref="step2">
+              <div class="step">
+                <img src="images/step2.png">
+              </div>
+              <div class="steptext">
+                <div class="deviation title" style="padding-top: 45px;">将二维码放入扫码区域</div>
+                <div class="deviation title"></div>
+                <div class="deviation tip" style="padding-top: 20px;">如遇打印问题请咨询客服</div>
+                <div class="deviation tip">400-680-0897</div>
+              </div>
+            </div>
+            <div class="time">
+              <div class="deviation timebox">
+                <div><img src="images/time.png"></div>
+                <div id="Date" class="timetext">{{timestr}}</div>
+                <div class="mixtips"> <span class="f15 m20">{{printerCompanyName}}</span><span class="f15">{{clientName}}</span></div>
+              </div>
+            </div>
+
+            <div class="stepbody cf">
+              <img src="images/phone1.png" id="stepbody1" style="display: inline;">
+              <img src="images/phone2.png" id="stepbody2" style="display: none;">
+            </div>
+            <div>
+              <div class="deviation stepbottom">
+                <div class="text">• {{bottomName}}<span @click="refresh">自助打印终端</span></div>
+                <div class="img"><img :src=bottomImg></div>
+                <div class="refresh-btn" @click="refresh">刷新</div>
+                <div class="serviceinfo" v-if="serviceTel">
+                  <span class="name">紧急联系人</span>
+                  <span class="tel">{{servicer}} &nbsp;&nbsp;{{serviceTel}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-show="pageState == 4 && printerStatus == 1 && authStatus == 1" class="welcome no-print">
+            <div class="steptop">
+              <div class="step">
+                <img src="images/step3.png">
+              </div>
+              <div class="steptext">
+                <div class="deviation title" style="padding-top: 45px;">正在打印</div>
+                <div class="deviation title">请取票 (<span id="Date2">{{printCountDownSecond}}</span>s)</div>
+                <div class="deviation tip" style="padding-top: 20px;">如遇打印问题请咨询客服</div>
+                <div class="deviation tip">400-680-0897</div>
+              </div>
+              <div class="time">
+                <div class="deviation timebox">
+                  <div><img src="images/time.png"></div>
+                  <div id="Date" class="timetext">{{timestr}}</div>
+                  <div class="mixtips"> <span class="f15 m20">{{printerCompanyName}}</span><span class="f15">{{clientName}}</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="stepbody cf">
+              <img src="images/phone3.png">
+            </div>
+            <div>
+              <div class="deviation stepbottom">
+                <div class="text">• {{bottomName}}<span @click="refresh">自助打印终端</span></div>
+                <div class="img"><img :src=bottomImg></div>
+                <div class="serviceinfo" v-if="serviceTel">
+                  <span class="name">紧急联系人</span>
+                  <span class="tel">{{servicer}} &nbsp;&nbsp;{{serviceTel}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2 - 异常 3 - 打印机缺纸 4 - 卡纸;-->
+          <div v-show="authStatus == 1 && printerStatus == 2" class="abnormal no-print">
+            <div class="steptop">
+              <div class="step">
+                <img src="images/cry.png">
+              </div>
+              <div class="steptext">
+                <div class="deviation title" style="padding-top: 45px;">打印机异常</div>
+                <div class="deviation title">无法正常使用</div>
+                <div class="deviation tip" style="padding-top: 40px;">请联系运维人员处理</div>
+              </div>
+              <div class="time">
+                <div class="deviation timebox">
+                  <div><img src="images/time.png"></div>
+                  <div id="Date" class="timetext">{{timestr}}</div>
+                  <div class="mixtips"> <span class="f15 m20">{{printerCompanyName}}</span><span class="f15">{{clientName}}</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="stepbody cf">
+              <img src="images/abnormal_2.png">
+            </div>
+            <div class="stepbottom">
+              <div class="text">• {{bottomName}}<span @click="refresh">自助打印终端</span></div>
+              <div class="img"><img :src=bottomImg></div>
+              <div class="serviceinfo" v-if="serviceTel">
+                <span class="name">紧急联系人</span>
+                <span class="tel">{{servicer}} &nbsp;&nbsp;{{serviceTel}}</span>
+              </div>
+            </div>
+          </div>
+          <div v-show="authStatus == 1 && printerStatus == 3" class="abnormal no-print">
+            <div class="steptop">
+              <div class="step">
+                <img src="images/cry.png">
+              </div>
+              <div class="steptext">
+                <div class="deviation title" style="padding-top: 45px;">打印机纸卷已经耗尽</div>
+                <div class="deviation title">无法打印小票</div>
+                <div class="deviation tip" style="padding-top: 40px;">请联系运维人员处理</div>
+              </div>
+              <div class="time">
+                <div class="deviation timebox">
+                  <div><img src="images/time.png"></div>
+                  <div id="Date" class="timetext">{{timestr}}</div>
+                  <div class="mixtips"> <span class="f15 m20">{{printerCompanyName}}</span><span class="f15">{{clientName}}</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="stepbody cf">
+              <img src="images/abnormal_3.png">
+            </div>
+            <div>
+              <div class="stepbottom">
+                <div class="text">• {{bottomName}}<span @click="refresh">自助打印终端</span></div>
+                <div class="img"><img :src=bottomImg></div>
+                <div class="serviceinfo" v-if="serviceTel">
+                  <span class="name">紧急联系人</span>
+                  <span class="tel">{{servicer}} &nbsp;&nbsp;{{serviceTel}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-show="authStatus == 1 && printerStatus == 4" class="abnormal no-print">
+            <div class="steptop">
+              <div class="step">
+                <img src="images/cry.png">
+              </div>
+              <div class="steptext">
+                <div class="deviation title" style="padding-top: 45px;">打印机卡纸</div>
+                <div class="deviation title">无法打印小票</div>
+                <div class="deviation tip" style="padding-top: 40px;">请联系运维人员处理</div>
+              </div>
+              <div class="time">
+                <div class="deviation timebox">
+                  <div><img src="images/time.png"></div>
+                  <div id="Date" class="timetext">{{timestr}}</div>
+                  <div class="mixtips"> <span class="f15 m20">{{printerCompanyName}}</span><span class="f15">{{clientName}}</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="stepbody cf">
+              <img src="images/abnormal_4.png">
+            </div>
+            <div>
+              <div class="stepbottom">
+                <div class="text">• {{bottomName}}<span @click="refresh">自助打印终端</span></div>
+                <div class="img"><img :src=bottomImg></div>
+                <div class="serviceinfo" v-if="serviceTel">
+                  <span class="name">紧急联系人</span>
+                  <span class="tel">{{servicer}} &nbsp;&nbsp;{{serviceTel}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-show="authStatus == 0" class="abnormal no-print">
+            <div class="steptop">
+              <div class="step">
+                <img src="images/cry.png">
+              </div>
+              <div class="steptext">
+                <div class="deviation title" v-show="clientId!=''" style="padding-top: 45px;">{{authErrorStr}}</div>
+                <div class="deviation title" v-show="clientId==''" style="padding-top: 45px;">未获取打印机数据</div>
+                <div class="deviation title">无法正常使用</div>
+                <div class="deviation tip" style="padding-top: 36px;">请联系运维人员处理</div>
+              </div>
+              <div class="time">
+                <div class="deviation timebox">
+                  <div><img src="images/time.png"></div>
+                  <div id="Date" class="timetext">{{timestr}}</div>
+                  <div class="mixtips"> <span class="f15 m20">{{printerCompanyName}}</span><span class="f15">{{clientName}}</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="stepbody cf">
+              <img src="images/abnormal_2.png">
+            </div>
+            <div>
+              <div class="stepbottom">
+                <div class="text">• {{bottomName}}<span @click="refresh">自助打印终端</span></div>
+                <div class="img"><img :src=bottomImg></div>
+                <div class="serviceinfo" v-if="serviceTel">
+                  <span class="name">紧急联系人</span>
+                  <span class="tel">{{servicer}} &nbsp;&nbsp;{{serviceTel}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!--startprint-->
+          <div class="testpage pagenext hide" :class="{'no-print':printtest==false}">
+              <div>串号：{{clientId}}</div>
+              <div>拌站联设置：{{mixPaperTitle}}</div>
+              <div>工地联设置：{{receivePaperTitle}}</div>
+              <div>泵车联设置：{{pumpPaperTitle}}</div>
+              <div>司机联设置：{{driverpage == 1?'是':'否'}}  {{driverPaperTitle}}</div>
+              <div>存根联设置：{{cgpage == 1?'是':'否'}}  {{cgPaperTitle}}</div>
+              <div>版本号：{{ver}}</div>
+              <div>拌站显示名称：{{subTitle}}</div>
+              <div>拌站名称：{{printerCompanyName}}</div>
+              <div>一体机号：{{clientName}}</div>
+          </div>
+          <div v-if="printTempleType==0">
+            <div class="projectbox pagenext hide" :class="{'no-print':printtest==true}">
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div>
+
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>{{qs}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{receivePaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode" ref="qrcode"></div>
+              </div>
+              <ul class="basic-info">
+                <li class="fhquantity">
+                  <div class="title">本车方量</div>
+                  <div class="content">{{fhQuantity}}</div>
+                </li>
+                <li class="cartimes">
+                  <div class="title">车数</div>
+                  <div class="content">{{fhCarTimes}}</div>
+                </li>
+                <li class="counts">
+                  <div class="title">累计发货量</div>
+                  <div class="content">{{totalQuantity}}</div>
+
+                </li>
+                <li class="part">
+                  <span class="title cf">{{tpz}}</span>
+                  <span class="content cf">{{tld}}</span>
+                </li>
+              </ul>
+              <div class="detail">
+                <span class="company"><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span class="contact"><em style="width: auto;">现场联系人</em>：{{receiverTel}}</span>
+                <span class="cf"><em>工程名称</em>：{{projectName}}</span>
+                <span class="cf"><em>工程地址</em>：{{projectAdd}}</span>
+              </div>
+              <div class="detail">
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>备注</em>：{{remark}}</span>
+                <span v-if="showPhbNo"><em>配合比号</em>：{{phbNo}}</span></span>
+              </div>
+              <div class="detail cf">
+                <span class="carnumber"><em>车号</em>：{{carNumber}}</span>
+                <span class="mixtable"><em>拌台号</em>：{{mixtable}}</span>
+                <span class="driver"><em>司机</em>：{{driverName}}</span>
+                <span class="fhy"><em>发货员</em>：{{fhy}}</span>
+                <span class="cf" v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                    <span v-if="salesPerson" class="salesPerson"><em>销售员</em>：{{salesPerson}}</span>
+                    <span v-if="signedBy" class="signedBy"><em>可签收人</em>：{{signedBy}}</span>
+              </div>
+              <div class="detail cf" v-if="muiltSign">
+                <span class="sign">收货人签名：</span>
+                <span class="remark"><em>签收备注</em>：</span>
+              </div>
+              <div class="detail cf pageavoid">
+                <span class="half"><em>合同编号</em>：{{contractNo}}</span>
+                <span class="createtime"><em>发货时间</em>：{{itemCreateTime}}</span>
+                <span class="itemorderno"><em>小票号</em>：{{itemOrderNo}}</span>
+              </div>
+              <div class="detail cf" v-if="linkInfo">
+                <span class="text-align-right">{{linkInfo}}</span>
+              </div>
+            </div>
+
+            <div class="mixbox pagenext hide" :class="{'no-print':printtest==true}">
+              <div class="header cf" :class="bigCssStyle">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div>
+                </div>
+                <div class="pl11 fr header-right">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>{{qs}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{mixPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode2" ref="qrcode2"></div>
+              </div>
+              <ul class="basic-info">
+                <li class="fhquantity">
+                  <div class="title">本车方量</div>
+                  <div class="content">{{fhQuantity}}</div>
+                </li>
+                <li class="cartimes">
+                  <div class="title">车数</div>
+                  <div class="content">{{fhCarTimes}}</div>
+                </li>
+                <li class="counts">
+                  <div class="title">累计发货量</div>
+                  <div class="content">{{totalQuantity}}</div>
+
+                </li>
+                <li class="part">
+                  <span class="title">{{tpz}}</span>
+                  <span class="content">{{tld}}</span>
+
+                </li>
+              </ul>
+              <div class="detail">
+                <span class="company"><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span class="contact"><em style="width: auto;">现场联系人</em>：{{receiverTel}}</span>
+                <span class="cf"><em>工程名称</em>：{{projectName}}</span>
+                <span class="cf"><em>工程地址</em>：{{projectAdd}}</span>
+              </div>
+              <div class="detail">
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>备注</em>：{{remark}}</span>
+                <span v-if="showPhbNo"><em>配合比号</em>：{{phbNo}}</span>
+              </div>
+              <div class="detail cf">
+                <span class="carnumber"><em>车号</em>：{{carNumber}}</span>
+                <span class="mixtable"><em>拌台号</em>：{{mixtable}}</span>
+                <span class="driver"><em>司机</em>：{{driverName}}</span>
+                <span class="fhy"><em>发货员</em>：{{fhy}}</span>
+                <span class="cf" v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                    <span v-if="salesPerson" class="salesPerson"><em>销售员</em>：{{salesPerson}}</span>
+                    <span v-if="signedBy" class="signedBy"><em>可签收人</em>：{{signedBy}}</span>
+              </div>
+              <div class="detail cf">
+                <span class="sign">收货人签名：</span>
+                <span class="remark"><em>签收备注</em>：</span>
+              </div>
+              <div class="detail cf">
+                <span class="half"><em>合同编号</em>：{{contractNo}}</span>
+                <span class="createtime"><em>发货时间</em>：{{itemCreateTime}}</span>
+                <span class="itemorderno"><em>小票号</em>：{{itemOrderNo}}</span>
+              </div>
+            </div>
+            <div class="pumpbox pagenext hide" :class="{'no-print':printtest==true}" >
+              <div class="header cf"  :class="bigCssStyle">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div>
+                </div>
+                <div class="pl11 fr header-right">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>{{qs}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{pumpPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode3" ref="qrcode3"></div>
+              </div>
+
+              <div class="detail">
+                <span><em>小票号</em>：{{itemOrderNo}}</span>
+                <span class=""><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span class=""><em>现场联系人</em>：{{receiverTel}}</span>
+                <span><em>工程名称</em>：{{projectName}}</span>
+                <span><em>工程地址</em>：{{projectAdd}}</span>
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>砼品种</em>：{{tpz}}</span>
+                <span><em>本车方量</em>：{{fhQuantity}}</span>
+                <span><em>累计方量</em>：{{totalQuantity}}</span>
+                <span><em>车号</em>：{{carNumber}}</span>
+                <span><em>司机</em>：{{driverName}}</span>
+                <span><em>合同编号</em>：{{contractNo}}</span>
+                <span><em>发货时间</em>：{{itemCreateTime}}</span>
+                <span v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                <span v-if="showPhbNo"><em>配合比号</em>：{{phbNo}}</span>
+                <span><em>备注</em>：{{remark}} <span :class="{'remark-bigger':pumpPrint==false}">{{pumpTips}}</span></span>
+                <span v-if="muiltSign"><em>签名</em>: </span>
+              </div>
+            </div>
+            <div class="mixbox pagenext hide" :class="{'no-print':printtest==true}" v-if="driverpage" >
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div>
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>{{qs}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{driverPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode4" ref="qrcode4"></div>
+              </div>
+              <ul class="basic-info">
+                <li class="fhquantity">
+                  <div class="title">本车方量</div>
+                  <div class="content">{{fhQuantity}}</div>
+                </li>
+                <li class="cartimes">
+                  <div class="title">车数</div>
+                  <div class="content">{{fhCarTimes}}</div>
+                </li>
+                <li class="counts">
+                  <div class="title">累计发货量</div>
+                  <div class="content">{{totalQuantity}}</div>
+                </li>
+                <li class="part">
+                  <span class="title">{{tpz}}</span>
+                  <span class="content">{{tld}}</span>
+                </li>
+              </ul>
+              <div class="detail">
+                <span class="company"><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span class="contact"><em style="width: auto;">现场联系人</em>：{{receiverTel}}</span>
+                <span class="cf"><em>工程名称</em>：{{projectName}}</span>
+                <span class="cf"><em>工程地址</em>：{{projectAdd}}</span>
+              </div>
+              <div class="detail">
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>备注</em>：{{remark}}</span>
+                <span v-if="showPhbNo"><em>配合比号</em>：{{phbNo}}</span>
+              </div>
+              <div class="detail cf">
+                <span class="carnumber"><em>车号</em>：{{carNumber}}</span>
+                <span class="mixtable"><em>拌台号</em>：{{mixtable}}</span>
+                <span class="driver"><em>司机</em>：{{driverName}}</span>
+                <span class="fhy"><em>发货员</em>：{{fhy}}</span>
+                <span class="cf" v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                    <span v-if="salesPerson" class="salesPerson"><em>销售员</em>：{{salesPerson}}</span>
+                    <span v-if="signedBy" class="signedBy"><em>可签收人</em>：{{signedBy}}</span>
+              </div>
+              <div class="detail cf">
+                <span class="itemorderno"><em>小票号</em>：{{itemOrderNo}}</span>
+                <span class="createtime"><em>发货时间</em>：{{itemCreateTime}}</span>
+              </div>
+            </div>
+            <div class="mixbox pagenext hide" :class="{'no-print':printtest==true}" v-if="cgpage" >
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div>
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>{{qs}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{cgPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode5" ref="qrcode5"></div>
+              </div>
+              <ul class="basic-info">
+                <li class="fhquantity">
+                  <div class="title">本车方量</div>
+                  <div class="content">{{fhQuantity}}</div>
+                </li>
+                <li class="cartimes">
+                  <div class="title">车数</div>
+                  <div class="content">{{fhCarTimes}}</div>
+                </li>
+                <li class="counts">
+                  <div class="title">累计发货量</div>
+                  <div class="content">{{totalQuantity}}</div>
+                </li>
+                <li class="part">
+                  <span class="title">{{tpz}}</span>
+                  <span class="content">{{tld}}</span>
+                </li>
+              </ul>
+              <div class="detail">
+                <span class="company"><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span class="contact"><em style="width: auto;">现场联系人</em>：{{receiverTel}}</span>
+                <span class="cf"><em>工程名称</em>：{{projectName}}</span>
+                <span class="cf"><em>工程地址</em>：{{projectAdd}}</span>
+              </div>
+              <div class="detail">
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>备注</em>：{{remark}}</span>
+                <span v-if="showPhbNo"><em>配合比号</em>：{{phbNo}}</span>
+              </div>
+              <div class="detail cf">
+                <span class="carnumber"><em>车号</em>：{{carNumber}}</span>
+                <span class="mixtable"><em>拌台号</em>：{{mixtable}}</span>
+                <span class="driver"><em>司机</em>：{{driverName}}</span>
+                <span class="fhy"><em>发货员</em>：{{fhy}}</span>
+                <span class="cf" v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                    <span v-if="salesPerson" class="salesPerson"><em>销售员</em>：{{salesPerson}}</span>
+                    <span v-if="signedBy" class="signedBy"><em>可签收人</em>：{{signedBy}}</span>
+              </div>
+              <div class="detail cf">
+                <span class="itemorderno"><em>小票号</em>：{{itemOrderNo}}</span>
+                <span class="createtime"><em>发货时间</em>：{{itemCreateTime}}</span>
+              </div>
+            </div>
+            <div class="mixbox pagenext hide" :class="{'no-print':printtest==true}" v-if="cwpage" >
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div>
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>{{qs}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{cwPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode6" ref="qrcode6"></div>
+              </div>
+              <ul class="basic-info">
+                <li class="fhquantity">
+                  <div class="title">本车方量</div>
+                  <div class="content">{{fhQuantity}}</div>
+                </li>
+                <li class="cartimes">
+                  <div class="title">车数</div>
+                  <div class="content">{{fhCarTimes}}</div>
+                </li>
+                <li class="counts">
+                  <div class="title">累计发货量</div>
+                  <div class="content">{{totalQuantity}}</div>
+                </li>
+                <li class="part">
+                  <span class="title">{{tpz}}</span>
+                  <span class="content">{{tld}}</span>
+                </li>
+              </ul>
+              <div class="detail">
+                <span class="company"><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span class="contact"><em style="width: auto;">现场联系人</em>：{{receiverTel}}</span>
+                <span class="cf"><em>工程名称</em>：{{projectName}}</span>
+                <span class="cf"><em>工程地址</em>：{{projectAdd}}</span>
+              </div>
+              <div class="detail">
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>备注</em>：{{remark}}</span>
+                <span v-if="showPhbNo"><em>配合比号</em>：{{phbNo}}</span>
+              </div>
+              <div class="detail cf">
+                <span class="carnumber"><em>车号</em>：{{carNumber}}</span>
+                <span class="mixtable"><em>拌台号</em>：{{mixtable}}</span>
+                <span class="driver"><em>司机</em>：{{driverName}}</span>
+                <span class="fhy"><em>发货员</em>：{{fhy}}</span>
+                <span class="cf" v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                    <span v-if="salesPerson" class="salesPerson"><em>销售员</em>：{{salesPerson}}</span>
+                    <span v-if="signedBy" class="signedBy"><em>可签收人</em>：{{signedBy}}</span>
+              </div>
+              <div class="detail cf" v-if="muiltSign">
+                <span class="sign">收货人签名：</span>
+                <span class="remark"><em>签收备注</em>：</span>
+              </div>
+              <div class="detail cf">
+                <span class="itemorderno"><em>小票号</em>：{{itemOrderNo}}</span>
+                <span class="createtime"><em>发货时间</em>：{{itemCreateTime}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!--hbfw-->
+          <div class="templete1" v-if="printTempleType==1">
+            <div class="projectbox pagenext hide" :class="{'no-print':printtest==true}">
+                <div class="header cf">
+                    <div class="fl logo-container">
+                      <div class="logo">
+                        <span class="company" style="padding-left:6px"> {{bigTitle}}</span>
+                        <span class="mix-name clearfl pl12">{{subTitle}}</span>
+                      </div>
+                      <div class="cf">
+                        <div class="task-no cleartextalign " style="float:left;width:50%">任务单号 {{taskNo}}</div>
+                        <div class="itemorder-no fl">小票号 {{itemOrderNo}}</div>
+                      </div>
+                    </div>
+                    <div class="pl11 fr">
+                      <div class="f15 tickettag">{{receivePaperTitle}}</div>
+                    </div>
+                    <div class="barcode fr" id="qrcode" ref="qrcode"></div>
+                </div>
+                <ul class="basic-info">
+                  <li class="fhquantity-fw">
+                    <div class="title">本车方量</div>
+                    <div class="content">{{fhQuantity}}</div>
+                  </li>
+                  <li class="cartimes-fw">
+                    <div class="title">车数</div>
+                    <div class="content">{{fhCarTimes}}</div>
+                  </li>
+                  <li class="counts-fw">
+                    <div class="title">累计发货</div>
+                    <div class="content">{{totalQuantity}}</div>
+
+                  </li>
+                </ul>
+                <div class="detail cf">
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tpz"><em>强度等级</em></div><div class="tpz" style="width: 60%"> <strong>{{tpz}}</strong></div>
+                    </div>
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tld"  ><em>坍落度</em></div><div class="tld" style="width: 60%"><strong>{{tld}}</strong></div>
+                    </div>
+                </div>
+                <div class="detail cf">
+                  <div class="cf">
+                    <div class="half">
+                      <span class="company title"><em>施工单位</em></span>
+                      <span class="content">{{receiveCompanyName}}</span>
+                    </div>
+                    <div class="half">
+                        <span class="contact title"><em>现场联系人</em></span>
+                        <span class="content">{{receiverName}}</span>
+                    </div>
+                  </div>
+                  <div class="cf">
+                      <div class="half">
+                        <span class="title"><em>工程名称</em></span>
+                        <span class="content">{{projectName}}</span>
+                      </div>
+                      <div class="half">
+                        <span class="title"><em>联系电话</em></span>
+                        <span class="content">{{receiverTel}}</span>
+                      </div>
+                  </div>
+                  <div class="cf onerow">
+                      <span class="title"><em>工程地址</em></span>
+                      <span class="content">{{projectAdd}}</span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                    <span class="title"><em>浇筑部位</em></span>
+                    <span class="content">{{jzbw}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>送达时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>浇筑方式</em></span>
+                      <span class="content">{{jzfs}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>起供时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>发货时间</em></span>
+                      <span class="content">{{itemCreateTime}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>截止时间</em></span>
+                      <span class="content"></span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <div class="third">
+                      <span class="title"><em>车号</em></span>
+                      <span class="content">{{carNumber}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>司机</em></span>
+                      <span class="content">{{driverName}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>拌台号</em></span>
+                      <span class="content">{{mixtable}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>发货员</em></span>
+                      <span class="content">{{fhy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>质检员</em></span>
+                      <span class="content">{{zjy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>泵手签字</em></span>
+                      <span class="content"></span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                      <span class="title"><em>搅拌楼电话</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title" style="width:35%"><em>值班调度电话</em></span>
+                      <span class="content">{{linkInfo}}</span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <span class="sign"><em>收货人签名</em></span>
+                  <span class="remark"><em>签收备注</em></span>
+                </div>
+                <div class="detail cf">
+                  <span style="font-size:10px"><em>备注</em>：卸灰前请先认真核对发货单，工地签收人签字后即为认可本车混凝土强度等级无误。</span>
+                </div>
+            </div>
+
+            <div class="mixbox pagenext hide" :class="{'no-print':printtest==true}">
+                <div class="header cf">
+                  <div class="fl logo-container">
+                    <div class="logo">
+                      <span class="company" style="padding-left:6px"> {{bigTitle}}</span>
+                      <span class="mix-name clearfl pl12">{{subTitle}}</span>
+                    </div>
+                    <div class="cf">
+                      <div class="task-no cleartextalign " style="float:left;width:50%">任务单号 {{taskNo}}</div>
+                      <div class="itemorder-no fl">小票号 {{itemOrderNo}}</div>
+                    </div>
+                  </div>
+                  <div class="pl11 fr">
+                    <div class="f15 tickettag">{{mixPaperTitle}}</div>
+                  </div>
+                  <div class="barcode fr" id="qrcode2" ref="qrcode2"></div>
+                </div>
+                <ul class="basic-info">
+                  <li class="fhquantity-fw">
+                    <div class="title">本车方量</div>
+                    <div class="content">{{fhQuantity}}</div>
+                  </li>
+                  <li class="cartimes-fw">
+                    <div class="title">车数</div>
+                    <div class="content">{{fhCarTimes}}</div>
+                  </li>
+                  <li class="counts-fw">
+                    <div class="title">累计发货</div>
+                    <div class="content">{{totalQuantity}}</div>
+
+                  </li>
+                </ul>
+                <div class="detail cf">
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tpz"><em>强度等级</em></div><div class="tpz" style="width: 60%"> <strong>{{tpz}}</strong></div>
+                    </div>
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tld"  ><em>坍落度</em></div><div class="tld" style="width: 60%"><strong>{{tld}}</strong></div>
+                    </div>
+                </div>
+                <div class="detail cf">
+                  <div class="cf">
+                    <div class="half">
+                      <span class="company title"><em>施工单位</em></span>
+                      <span class="content">{{receiveCompanyName}}</span>
+                    </div>
+                    <div class="half">
+                        <span class="contact title"><em>现场联系人</em></span>
+                        <span class="content">{{receiverName}}</span>
+                    </div>
+                  </div>
+                  <div class="cf">
+                      <div class="half">
+                        <span class="title"><em>工程名称</em></span>
+                        <span class="content">{{projectName}}</span>
+                      </div>
+                      <div class="half">
+                        <span class="title"><em>联系电话</em></span>
+                        <span class="content">{{receiverTel}}</span>
+                      </div>
+                  </div>
+                  <div class="cf onerow">
+                      <span class="title"><em>工程地址</em></span>
+                      <span class="content">{{projectAdd}}</span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                    <span class="title"><em>浇筑部位</em></span>
+                    <span class="content">{{jzbw}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>送达时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>浇筑方式</em></span>
+                      <span class="content">{{jzfs}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>起供时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>发货时间</em></span>
+                      <span class="content">{{itemCreateTime}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>截止时间</em></span>
+                      <span class="content"></span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <div class="third">
+                      <span class="title"><em>车号</em></span>
+                      <span class="content">{{carNumber}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>司机</em></span>
+                      <span class="content">{{driverName}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>拌台号</em></span>
+                      <span class="content">{{mixtable}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>发货员</em></span>
+                      <span class="content">{{fhy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>质检员</em></span>
+                      <span class="content">{{zjy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>泵手签字</em></span>
+                      <span class="content"></span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                      <span class="title"><em>搅拌楼电话</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title" style="width:35%"><em>值班调度电话</em></span>
+                      <span class="content">{{linkInfo}}</span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <span class="sign"><em>收货人签名</em></span>
+                  <span class="remark"><em>签收备注</em></span>
+                </div>
+                <div class="detail cf">
+                  <span style="font-size:10px"><em>备注</em>：卸灰前请先认真核对发货单，工地签收人签字后即为认可本车混凝土强度等级无误。</span>
+                </div>
+            </div>
+
+            <div class="pumpbox pagenext hide" :class="{'no-print':printtest==true}" >
+                <div class="header cf">
+                    <div class="fl logo-container">
+                      <div class="logo">
+                        <span class="company" style="padding-left:6px"> {{bigTitle}}</span>
+                        <span class="mix-name clearfl pl12">{{subTitle}}</span>
+                      </div>
+                      <div class="cf">
+                        <div class="task-no cleartextalign " style="float:left;width:50%">任务单号 {{taskNo}}</div>
+                        <div class="itemorder-no fl">小票号 {{itemOrderNo}}</div>
+                      </div>
+                    </div>
+
+                  <div class="pl11 fr">
+                    <div class="f15 tickettag">{{pumpPaperTitle}}</div>
+                  </div>
+                  <div class="barcode fr" id="qrcode3" ref="qrcode3"></div>
+                </div>
+
+                <div class="detail">
+                  <span class=""><em>施工单位</em>：{{receiveCompanyName}}</span>
+                  <span class=""><em>现场联系人</em>：{{receiverTel}}</span>
+                  <span><em>工程名称</em>：{{projectName}}</span>
+                  <span><em>工程地址</em>：{{projectAdd}}</span>
+                  <span><em>浇筑部位</em>：{{jzbw}}</span>
+                  <span><em>浇筑方式</em>：{{jzfs}}</span>
+                  <span><em>砼品种</em>：{{tpz}}</span>
+                  <span><em>本车方量</em>：{{fhQuantity}}</span>
+                  <span><em>累计方量</em>：{{totalQuantity}}</span>
+                  <span><em>车号</em>：{{carNumber}}</span>
+                  <span><em>司机</em>：{{driverName}}</span>
+                  <span><em>发货时间</em>：{{itemCreateTime}}</span>
+                  <span v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                  <span v-if="showPhbNo"><em>配合比号</em>：{{phbNo}}</span>
+                  <span><em>备注</em>：{{remark}} <span :class="{'remark-bigger':pumpPrint==false}">{{pumpTips}}</span></span>
+                  <span v-if="muiltSign"><em>签名</em>: </span>
+                </div>
+            </div>
+
+            <div class="mixbox pagenext hide" :class="{'no-print':printtest==true}" v-if="driverpage" >
+                <div class="header cf">
+                    <div class="fl logo-container">
+                      <div class="logo">
+                        <span class="company" style="padding-left:6px"> {{bigTitle}}</span>
+                        <span class="mix-name clearfl pl12">{{subTitle}}</span>
+                      </div>
+                      <div class="cf">
+                        <div class="task-no cleartextalign " style="float:left;width:50%">任务单号 {{taskNo}}</div>
+                        <div class="itemorder-no fl">小票号 {{itemOrderNo}}</div>
+                      </div>
+                    </div>
+                    <div class="pl11 fr">
+                      <div class="f15 tickettag">{{driverPaperTitle}}</div>
+                    </div>
+                    <div class="barcode fr" id="qrcode4" ref="qrcode4"></div>
+                </div>
+                <ul class="basic-info">
+                  <li class="fhquantity-fw">
+                    <div class="title">本车方量</div>
+                    <div class="content">{{fhQuantity}}</div>
+                  </li>
+                  <li class="cartimes-fw">
+                    <div class="title">车数</div>
+                    <div class="content">{{fhCarTimes}}</div>
+                  </li>
+                  <li class="counts-fw">
+                    <div class="title">累计发货</div>
+                    <div class="content">{{totalQuantity}}</div>
+
+                  </li>
+                </ul>
+                <div class="detail cf">
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tpz"><em>强度等级</em></div><div class="tpz" style="width: 60%"> <strong>{{tpz}}</strong></div>
+                    </div>
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tld"  ><em>坍落度</em></div><div class="tld" style="width: 60%"><strong>{{tld}}</strong></div>
+                    </div>
+                </div>
+                <div class="detail cf">
+                  <div class="cf">
+                    <div class="half">
+                      <span class="company title"><em>施工单位</em></span>
+                      <span class="content">{{receiveCompanyName}}</span>
+                    </div>
+                    <div class="half">
+                        <span class="contact title"><em>现场联系人</em></span>
+                        <span class="content">{{receiverName}}</span>
+                    </div>
+                  </div>
+                  <div class="cf">
+                      <div class="half">
+                        <span class="title"><em>工程名称</em></span>
+                        <span class="content">{{projectName}}</span>
+                      </div>
+                      <div class="half">
+                        <span class="title"><em>联系电话</em></span>
+                        <span class="content">{{receiverTel}}</span>
+                      </div>
+                  </div>
+                  <div class="cf onerow">
+                      <span class="title"><em>工程地址</em></span>
+                      <span class="content">{{projectAdd}}</span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                    <span class="title"><em>浇筑部位</em></span>
+                    <span class="content">{{jzbw}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>送达时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>浇筑方式</em></span>
+                      <span class="content">{{jzfs}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>起供时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>发货时间</em></span>
+                      <span class="content">{{itemCreateTime}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>截止时间</em></span>
+                      <span class="content"></span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <div class="third">
+                      <span class="title"><em>车号</em></span>
+                      <span class="content">{{carNumber}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>司机</em></span>
+                      <span class="content">{{driverName}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>拌台号</em></span>
+                      <span class="content">{{mixtable}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>发货员</em></span>
+                      <span class="content">{{fhy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>质检员</em></span>
+                      <span class="content">{{zjy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>泵手签字</em></span>
+                      <span class="content"></span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                      <span class="title"><em>搅拌楼电话</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title" style="width:35%"><em>值班调度电话</em></span>
+                      <span class="content">{{linkInfo}}</span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <span class="sign"><em>收货人签名</em></span>
+                  <span class="remark"><em>签收备注</em></span>
+                </div>
+                <div class="detail cf">
+                  <span style="font-size:10px"><em>备注</em>：卸灰前请先认真核对发货单，工地签收人签字后即为认可本车混凝土强度等级无误。</span>
+                </div>
+            </div>
+
+            <div class="mixbox pagenext hide" :class="{'no-print':printtest==true}" v-if="cgpage" >
+                <div class="header cf">
+                    <div class="fl logo-container">
+                      <div class="logo">
+                        <span class="company" style="padding-left:6px"> {{bigTitle}}</span>
+                        <span class="mix-name clearfl pl12">{{subTitle}}</span>
+                      </div>
+                      <div class="cf">
+                        <div class="task-no cleartextalign " style="float:left;width:50%">任务单号 {{taskNo}}</div>
+                        <div class="itemorder-no fl">小票号 {{itemOrderNo}}</div>
+                      </div>
+                    </div>
+                    <div class="pl11 fr">
+                      <div class="f15 tickettag">{{cgPaperTitle}}</div>
+                    </div>
+                    <div class="barcode fr" id="qrcode5" ref="qrcode5"></div>
+                </div>
+                <ul class="basic-info">
+                  <li class="fhquantity-fw">
+                    <div class="title">本车方量</div>
+                    <div class="content">{{fhQuantity}}</div>
+                  </li>
+                  <li class="cartimes-fw">
+                    <div class="title">车数</div>
+                    <div class="content">{{fhCarTimes}}</div>
+                  </li>
+                  <li class="counts-fw">
+                    <div class="title">累计发货</div>
+                    <div class="content">{{totalQuantity}}</div>
+
+                  </li>
+                </ul>
+                <div class="detail cf">
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tpz"><em>强度等级</em></div><div class="tpz" style="width: 60%"> <strong>{{tpz}}</strong></div>
+                    </div>
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tld"  ><em>坍落度</em></div><div class="tld" style="width: 60%"><strong>{{tld}}</strong></div>
+                    </div>
+                </div>
+                <div class="detail cf">
+                  <div class="cf">
+                    <div class="half">
+                      <span class="company title"><em>施工单位</em></span>
+                      <span class="content">{{receiveCompanyName}}</span>
+                    </div>
+                    <div class="half">
+                        <span class="contact title"><em>现场联系人</em></span>
+                        <span class="content">{{receiverName}}</span>
+                    </div>
+                  </div>
+                  <div class="cf">
+                      <div class="half">
+                        <span class="title"><em>工程名称</em></span>
+                        <span class="content">{{projectName}}</span>
+                      </div>
+                      <div class="half">
+                        <span class="title"><em>联系电话</em></span>
+                        <span class="content">{{receiverTel}}</span>
+                      </div>
+                  </div>
+                  <div class="cf onerow">
+                      <span class="title"><em>工程地址</em></span>
+                      <span class="content">{{projectAdd}}</span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                    <span class="title"><em>浇筑部位</em></span>
+                    <span class="content">{{jzbw}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>送达时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>浇筑方式</em></span>
+                      <span class="content">{{jzfs}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>起供时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>发货时间</em></span>
+                      <span class="content">{{itemCreateTime}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>截止时间</em></span>
+                      <span class="content"></span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <div class="third">
+                      <span class="title"><em>车号</em></span>
+                      <span class="content">{{carNumber}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>司机</em></span>
+                      <span class="content">{{driverName}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>拌台号</em></span>
+                      <span class="content">{{mixtable}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>发货员</em></span>
+                      <span class="content">{{fhy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>质检员</em></span>
+                      <span class="content">{{zjy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>泵手签字</em></span>
+                      <span class="content"></span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                      <span class="title"><em>搅拌楼电话</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title" style="width:35%"><em>值班调度电话</em></span>
+                      <span class="content">{{linkInfo}}</span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <span class="sign"><em>收货人签名</em></span>
+                  <span class="remark"><em>签收备注</em></span>
+                </div>
+                <div class="detail cf">
+                  <span style="font-size:10px"><em>备注</em>：卸灰前请先认真核对发货单，工地签收人签字后即为认可本车混凝土强度等级无误。</span>
+                </div>
+            </div>
+
+            <div class="mixbox pagenext hide" :class="{'no-print':printtest==true}" v-if="cwpage" >
+                <div class="header cf">
+                    <div class="fl logo-container">
+                      <div class="logo">
+                        <span class="company" style="padding-left:6px"> {{bigTitle}}</span>
+                        <span class="mix-name clearfl pl12">{{subTitle}}</span>
+                      </div>
+                      <div class="cf">
+                        <div class="task-no cleartextalign " style="float:left;width:50%">任务单号 {{taskNo}}</div>
+                        <div class="itemorder-no fl">小票号 {{itemOrderNo}}</div>
+                      </div>
+                    </div>
+                    <div class="pl11 fr">
+                      <div class="f15 tickettag">{{cwPaperTitle}}</div>
+                    </div>
+                    <div class="barcode fr" id="qrcode6" ref="qrcode6"></div>
+                </div>
+                <ul class="basic-info">
+                  <li class="fhquantity-fw">
+                    <div class="title">本车方量</div>
+                    <div class="content">{{fhQuantity}}</div>
+                  </li>
+                  <li class="cartimes-fw">
+                    <div class="title">车数</div>
+                    <div class="content">{{fhCarTimes}}</div>
+                  </li>
+                  <li class="counts-fw">
+                    <div class="title">累计发货</div>
+                    <div class="content">{{totalQuantity}}</div>
+
+                  </li>
+                </ul>
+                <div class="detail cf">
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tpz"><em>强度等级</em></div><div class="tpz" style="width: 60%"> <strong>{{tpz}}</strong></div>
+                    </div>
+                    <div class="half" style="line-height: 36px;">
+                      <div class="tld"  ><em>坍落度</em></div><div class="tld" style="width: 60%"><strong>{{tld}}</strong></div>
+                    </div>
+                </div>
+                <div class="detail cf">
+                  <div class="cf">
+                    <div class="half">
+                      <span class="company title"><em>施工单位</em></span>
+                      <span class="content">{{receiveCompanyName}}</span>
+                    </div>
+                    <div class="half">
+                        <span class="contact title"><em>现场联系人</em></span>
+                        <span class="content">{{receiverName}}</span>
+                    </div>
+                  </div>
+                  <div class="cf">
+                      <div class="half">
+                        <span class="title"><em>工程名称</em></span>
+                        <span class="content">{{projectName}}</span>
+                      </div>
+                      <div class="half">
+                        <span class="title"><em>联系电话</em></span>
+                        <span class="content">{{receiverTel}}</span>
+                      </div>
+                  </div>
+                  <div class="cf onerow">
+                      <span class="title"><em>工程地址</em></span>
+                      <span class="content">{{projectAdd}}</span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                    <span class="title"><em>浇筑部位</em></span>
+                    <span class="content">{{jzbw}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>送达时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>浇筑方式</em></span>
+                      <span class="content">{{jzfs}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>起供时间</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>发货时间</em></span>
+                      <span class="content">{{itemCreateTime}}</span>
+                  </div>
+                  <div class="half">
+                      <span class="title"><em>截止时间</em></span>
+                      <span class="content"></span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <div class="third">
+                      <span class="title"><em>车号</em></span>
+                      <span class="content">{{carNumber}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>司机</em></span>
+                      <span class="content">{{driverName}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>拌台号</em></span>
+                      <span class="content">{{mixtable}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>发货员</em></span>
+                      <span class="content">{{fhy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>质检员</em></span>
+                      <span class="content">{{zjy}}</span>
+                  </div>
+                  <div class="third">
+                      <span class="title"><em>泵手签字</em></span>
+                      <span class="content"></span>
+                  </div>
+                </div>
+                <div class="detail cf">
+                  <div class="half">
+                      <span class="title"><em>搅拌楼电话</em></span>
+                      <span class="content"></span>
+                  </div>
+                  <div class="half">
+                      <span class="title" style="width:35%"><em>值班调度电话</em></span>
+                      <span class="content">{{linkInfo}}</span>
+                  </div>
+
+                </div>
+                <div class="detail cf">
+                  <span class="sign"><em>收货人签名</em></span>
+                  <span class="remark"><em>签收备注</em></span>
+                </div>
+                <div class="detail cf">
+                  <span style="font-size:10px"><em>备注</em>：卸灰前请先认真核对发货单，工地签收人签字后即为认可本车混凝土强度等级无误。</span>
+                </div>
+            </div>
+
+          </div>
+
+          <div class="templete2" v-if="printTempleType==2">
+            <div class="pumpbox pagenext hide" :class="{'no-print':printtest==true}">
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div class="lineinfo">
+                    <div class='inline' >单号 {{taskNo}}</div>
+                    <div class='inline' >配比号 {{phbNo}}</div>
+                    <div class='inline' >合同号 {{contractNo}}</div>
+                  </div>
+                </div>
+                <div class="pl11 fr">
+                  <div>生产线{{mixtable}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{receivePaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode" ref="qrcode"></div>
+              </div>
+              <div class="detail cf">
+                <span><em>小票编号</em>：{{itemOrderNo}}</span>
+                <span><em>工程名称</em>：{{projectName}}</span>
+                <span><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>工程地址</em>：{{projectAdd}}</span>
+                <span><em>砼品种</em>：{{tpz}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>坍落度</em>：{{tld}}</span>
+                <span><em>车号</em>：{{carNumber}}</span>
+                <span><em>运距</em>：{{transportDistance}}</span>
+                <span><em>驾驶员</em>：{{driverName}}</span>
+                <span><em>发货时间</em>：{{itemCreateTime}}</span>
+                <span><em>到达时间</em></em>：</span>
+                <span><em>计划方量</em>：{{planQuantity}}</span>
+                <span><em>本车方量</em>：{{fhQuantity}}</span>
+                <span><em>累计方量</em>：{{totalQuantity}}</span>
+                <span><em>累计车数</em>：{{fhCarTimes}}</span>
+                <span>
+                  <div class="inline-table"><em>说明</em>：</div>
+                  <div class="inline-table" style="width: 80%;"><span class="f10">未经本公司许可不得往混凝土加水及其他材料，否则由此引起的问题概不负责。客户收料前请先审核货物规格及数量以防误收</span></div>
+                </span>
+                <span><em>备注</em>：{{remark}} <span :class="{'remark-bigger':pumpPrint==false}">{{pumpTips}}</span></span>
+                <span><em>签收人</em>: </span>
+              </div>
+              <div class="detail cf" style="border-top:0px;">
+                <span><em>公司地址</em>：{{companyAddress}}</span>
+                <span>
+                  <span class="inline one-third">计划：{{planQuantity}}</span>
+                  <span class="inline">调度电话：{{linkInfo}}</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="pumpbox pagenext hide" :class="{'no-print':printtest==true}">
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div class="lineinfo">
+                    <div class='inline' >单号 {{taskNo}}</div>
+                    <div class='inline' >配比号 {{phbNo}}</div>
+                    <div class='inline' >合同号 {{contractNo}}</div>
+                  </div>
+                  <!-- <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div> -->
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>生产线{{mixtable}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{mixPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode2" ref="qrcode2"></div>
+              </div>
+              <div class="detail cf">
+                <span><em>小票编号</em>：{{itemOrderNo}}</span>
+                <span><em>工程名称</em>：{{projectName}}</span>
+                <span><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>工程地址</em>：{{projectAdd}}</span>
+                <span><em>砼品种</em>：{{tpz}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>坍落度</em>：{{tld}}</span>
+                <span><em>车号</em>：{{carNumber}}</span>
+                <span><em>运距</em>：{{transportDistance}}</span>
+                <span><em>驾驶员</em>：{{driverName}}</span>
+                <span><em>发货时间</em>：{{itemCreateTime}}</span>
+                <span><em>到达时间</em></em>：</span>
+                <span><em>计划方量</em>：{{planQuantity}}</span>
+                <span><em>本车方量</em>：{{fhQuantity}}</span>
+                <span><em>累计方量</em>：{{totalQuantity}}</span>
+                <span><em>累计车数</em>：{{fhCarTimes}}</span>
+                <span>
+                  <div class="inline-table"><em>说明</em>：</div>
+                  <div class="inline-table" style="width: 80%;"><span class="f10">未经本公司许可不得往混凝土加水及其他材料，否则由此引起的问题概不负责。客户收料前请先审核货物规格及数量以防误收</span></div>
+                </span>
+                <span><em>备注</em>：{{remark}} <span :class="{'remark-bigger':pumpPrint==false}">{{pumpTips}}</span></span>
+                <span><em>签收人</em>: </span>
+              </div>
+              <div class="detail cf" style="border-top:0px;">
+                <span><em>公司地址</em>：{{companyAddress}}</span>
+                <span>
+                  <span class="inline one-third">计划：{{planQuantity}}</span>
+                  <span class="inline">调度电话：{{linkInfo}}</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="pumpbox pagenext hide" :class="{'no-print':printtest==true}">
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div class="lineinfo">
+                    <div class='inline' >单号 {{taskNo}}</div>
+                    <div class='inline' >配比号 {{phbNo}}</div>
+                    <div class='inline' >合同号 {{contractNo}}</div>
+                  </div>
+                  <!-- <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div> -->
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>生产线{{mixtable}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{pumpPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode3" ref="qrcode3"></div>
+              </div>
+              <div class="detail cf">
+                <span><em>小票编号</em>：{{itemOrderNo}}</span>
+                <span><em>工程名称</em>：{{projectName}}</span>
+                <span><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>工程地址</em>：{{projectAdd}}</span>
+                <span><em>砼品种</em>：{{tpz}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>坍落度</em>：{{tld}}</span>
+                <span><em>车号</em>：{{carNumber}}</span>
+                <span><em>运距</em>：{{transportDistance}}</span>
+                <span><em>驾驶员</em>：{{driverName}}</span>
+                <span><em>发货时间</em>：{{itemCreateTime}}</span>
+                <span><em>到达时间</em></em>：</span>
+                <span><em>计划方量</em>：{{planQuantity}}</span>
+                <span><em>本车方量</em>：{{fhQuantity}}</span>
+                <span><em>累计方量</em>：{{totalQuantity}}</span>
+                <span><em>累计车数</em>：{{fhCarTimes}}</span>
+                <span>
+                  <div class="inline-table"><em>说明</em>：</div>
+                  <div class="inline-table" style="width: 80%;"><span class="f10">未经本公司许可不得往混凝土加水及其他材料，否则由此引起的问题概不负责。客户收料前请先审核货物规格及数量以防误收</span></div>
+                </span>
+                <span><em>备注</em>：{{remark}} <span :class="{'remark-bigger':pumpPrint==false}">{{pumpTips}}</span></span>
+                <span><em>签收人</em>: </span>
+              </div>
+              <div class="detail cf" style="border-top:0px;">
+                <span><em>公司地址</em>：{{companyAddress}}</span>
+                <span>
+                  <span class="inline one-third">计划：{{planQuantity}}</span>
+                  <span class="inline">调度电话：{{linkInfo}}</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="pumpbox pagenext hide" :class="{'no-print':printtest==true}" v-if="driverpage">
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div class="lineinfo">
+                    <div class='inline' >单号 {{taskNo}}</div>
+                    <div class='inline' >配比号 {{phbNo}}</div>
+                    <div class='inline' >合同号 {{contractNo}}</div>
+                  </div>
+                  <!-- <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div> -->
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>生产线{{mixtable}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{driverPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode4" ref="qrcode4"></div>
+              </div>
+              <div class="detail cf">
+                <span><em>小票编号</em>：{{itemOrderNo}}</span>
+                <span><em>工程名称</em>：{{projectName}}</span>
+                <span><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>工程地址</em>：{{projectAdd}}</span>
+                <span><em>砼品种</em>：{{tpz}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>坍落度</em>：{{tld}}</span>
+                <span><em>车号</em>：{{carNumber}}</span>
+                <span><em>运距</em>：{{transportDistance}}</span>
+                <span><em>驾驶员</em>：{{driverName}}</span>
+                <span><em>发货时间</em>：{{itemCreateTime}}</span>
+                <span><em>到达时间</em></em>：</span>
+                <span><em>计划方量</em>：{{planQuantity}}</span>
+                <span><em>本车方量</em>：{{fhQuantity}}</span>
+                <span><em>累计方量</em>：{{totalQuantity}}</span>
+                <span><em>累计车数</em>：{{fhCarTimes}}</span>
+                <span>
+                  <div class="inline-table"><em>说明</em>：</div>
+                  <div class="inline-table" style="width: 80%;"><span class="f10">未经本公司许可不得往混凝土加水及其他材料，否则由此引起的问题概不负责。客户收料前请先审核货物规格及数量以防误收</span></div>
+                </span>
+                <span><em>备注</em>：{{remark}} <span :class="{'remark-bigger':pumpPrint==false}">{{pumpTips}}</span></span>
+                <span><em>签收人</em>: </span>
+              </div>
+              <div class="detail cf" style="border-top:0px;">
+                <span><em>公司地址</em>：{{companyAddress}}</span>
+                <span>
+                  <span class="inline one-third">计划：{{planQuantity}}</span>
+                  <span class="inline">调度电话：{{linkInfo}}</span>
+                </span>
+              </div>
+            </div>
+            <div class="pumpbox pagenext hide" :class="{'no-print':printtest==true}" v-if="cgpage">
+              <div class="header cf">
+                <div class="fl logo-container">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div class="lineinfo">
+                    <div class='inline' >单号 {{taskNo}}</div>
+                    <div class='inline' >配比号 {{phbNo}}</div>
+                    <div class='inline' >合同号 {{contractNo}}</div>
+                  </div>
+                  <!-- <div>
+                    <div class="mix-name">{{subTitle}}</div>
+                    <div class="task-no">任务单号 {{taskNo}}</div>
+                  </div> -->
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div>生产线{{mixtable}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{cgPaperTitle}}</div>
+                </div>
+                <div class="barcode fr" id="qrcode5" ref="qrcode5"></div>
+              </div>
+              <div class="detail cf">
+                <span><em>小票编号</em>：{{itemOrderNo}}</span>
+                <span><em>工程名称</em>：{{projectName}}</span>
+                <span><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>工程地址</em>：{{projectAdd}}</span>
+                <span><em>砼品种</em>：{{tpz}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>坍落度</em>：{{tld}}</span>
+                <span><em>车号</em>：{{carNumber}}</span>
+                <span><em>运距</em>：{{transportDistance}}</span>
+                <span><em>驾驶员</em>：{{driverName}}</span>
+                <span><em>发货时间</em>：{{itemCreateTime}}</span>
+                <span><em>到达时间</em></em>：</span>
+                <span><em>计划方量</em>：{{planQuantity}}</span>
+                <span><em>本车方量</em>：{{fhQuantity}}</span>
+                <span><em>累计方量</em>：{{totalQuantity}}</span>
+                <span><em>累计车数</em>：{{fhCarTimes}}</span>
+                <span>
+                  <div class="inline-table"><em>说明</em>：</div>
+                  <div class="inline-table" style="width: 80%;"><span class="f10">未经本公司许可不得往混凝土加水及其他材料，否则由此引起的问题概不负责。客户收料前请先审核货物规格及数量以防误收</span></div>
+                </span>
+                <span><em>备注</em>：{{remark}} <span :class="{'remark-bigger':pumpPrint==false}">{{pumpTips}}</span></span>
+                <span><em>签收人</em>: </span>
+              </div>
+              <div class="detail cf" style="border-top:0px;">
+                <span><em>公司地址</em>：{{companyAddress}}</span>
+                <span>
+                  <span class="inline one-third">计划：{{planQuantity}}</span>
+                  <span class="inline">调度电话：{{linkInfo}}</span>
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="templete3" v-if="printTempleType==3">
+            <div class="box pagenext mt10 hide" :class="{'no-print':printtest==true}" v-for="footvalue in pagerSet">
+              <h1>{{bigTitle}}</h1>
+              <h3>{{subTitle}}</h3>
+              <div class="top-info">
+                <div>
+                  <div class="one-third">生产日期：{{ticketCreateDate}}</div>
+                  <div class="one-third">生产线编号：{{mixtable}}</div>
+                  <div class="one-third">票号NO：{{itemOrderNo}}</div>
+                </div>
+                <!-- <div>
+                  <div class="half"></div>
+                  <div class="half"></div>
+                </div> -->
+              </div>
+              <div class="center-box cf">
+                <div class="center-row cf">
+                  <div class="center-key">
+                    订单单位
+                  </div>
+                  <div class="center-value" style="width:calc( 100% - 125px)">
+                    {{receiveCompanyName}}
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="center-key">
+                    工程名称
+                  </div>
+                  <div class="center-value" style="width:calc( 100% - 125px)">
+                    {{projectName}}
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="center-key">
+                    工程地点
+                  </div>
+                  <div class="center-value" style="width:calc( 100% - 125px)">
+                    {{projectAdd}}
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">合同编号</div><div class="center-value">{{contractNo}}</div>
+                  </div>
+                  <div class="water-flag">{{tpz}}</div>
+                  <div class="fl left-border">
+                    <div class="center-key">所属镇区</div><div class="center-value"></div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">订货单编号</div><div class="center-value">{{taskNo}}</div>
+                  </div>
+                  <div class="fl left-border">
+                    <div class="center-key">配合比编号</div><div class="center-value"></div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="special-tpz">
+                    <div class="center-key">使用部位</div><div class="center-value">{{jzbw}}</div>
+                  </div>
+                  <div class="fl left-border">
+                    <div class="center-key">累计车数</div><div class="center-value">{{fhCarTimes}}</div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">强度等级</div><div class="center-value">{{otherTpz}}</div>
+                  </div>
+                  <div class="fl left-border halfwidth">
+                    <div class="center-key">特殊要求</div><div class="center-value">{{jzfs}}</div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">设计坍落度</div><div class="center-value">{{tld}}</div>
+                  </div>
+                  <div class="fl left-border halfwidth">
+                    <div class="center-key">到达时间</div><div class="center-value">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;时&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分</div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">订购方量</div><div class="center-value">{{planQuantity}}m³</div>
+                  </div>
+                  <div class="fl left-border halfwidth">
+                    <div class="center-key">卸货时间</div><div class="center-value">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;时&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分</div>
+                  </div>
+
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">本车数量</div><div class="center-value">{{fhQuantity}}m³</div>
+                  </div>
+                  <div class="fl left-border halfwidth">
+                    <div class="center-key">卸完时间</div><div class="center-value">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;时&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分</div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">已供数量</div><div class="center-value">{{totalQuantity}}m³</div>
+                  </div>
+                  <div class="fl left-border halfwidth">
+                    <div class="center-key">限用时间</div><div class="center-value">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分</div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">发货时间</div><div class="center-value">{{ticketCreateTime}}</div>
+                  </div>
+                  <div class="fl left-border halfwidth">
+                    <div class="center-key">运输负责人</div><div class="center-value"> {{driverName}}</div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key">发货人</div><div class="center-value"> {{fhy}}</div>
+                  </div>
+                  <div class="fl left-border halfwidth">
+                    <div class="center-key">运输车号</div><div class="center-value">{{carNumber}} &nbsp; {{carLisense}}</div>
+                  </div>
+                </div>
+                <div class="center-row cf">
+                  <div class="half">
+                    <div class="center-key" style="width:auto">石子最大粒径(mm)</div>
+                  </div>
+                  <div class="fl left-border halfwidth">
+                    <div class="center-key">混凝土标记</div><div class="center-value"> </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tips cf">
+                进场验收内容及结论(以下由使用方填写,三方签字确认)
+              </div>
+              <div class="check-box cf">
+                <div class="cf bottom-border">
+                  <div class="left-box right-border">
+                    <div class="center-row cf">
+                      <div class="half">
+                        <div class="center-key">验收项目</div>
+                      </div>
+                      <div class="fl left-border right-width">
+                        <div class="center-key">验收情况</div>
+                      </div>
+                    </div>
+                    <div class="center-row cf">
+                      <div class="half right-border">
+                        <div class="center-key">坍落度实测值</div>
+                      </div>
+                      <div class="fl">
+                      </div>
+                    </div>
+                    <div class="center-row cf">
+                      <div class="half right-border">
+                        <div class="center-key">拌合物性能情况(目测)<p>和易用性、保水性、粘聚性</div>
+                      </div>
+                      <div class="fl">
+                      </div>
+                    </div>
+                    <div class=" cf" style="font-size: 14px;">
+                      <div class="fl right-border" style="width: 14%;height: 56px;"><span class="center-sub-key" style="margin-top: 5px;">试件成型</span></div>
+                      <div class="fl right-border" style="width: 25%;height: 56px;">
+                        <div class="bottom-border" style="height: 50%;box-sizing:border-box"><span class="center-sub-key" >养护类型</span></div>
+                        <div class=""><span class="center-sub-key">编号及规格</span></div>
+                      </div>
+                      <div class="fl right-border" style="width: 30%;height: 56px;">
+                        <div class="cf check-area bottom-border" style="height: 50%;box-sizing:border-box">
+                          <span class="square"></span>标养
+                        </div>
+
+                      </div>
+                      <div class="fl" style="width: 30%;height: 56px;">
+                        <div class="cf check-area bottom-border" style="height: 50%;box-sizing:border-box">
+                          <span class="square"></span>同条件养护
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="right-box">
+                    <div class="center-key">进厂验收结论</div>
+                    <div style="padding:10px 25px">
+                      <div class="f14"><span class="square"></span>同意使用</div>
+                    </div>
+                    <div style="padding:10px 25px">
+                      <div class="f14"><span class="square"></span>不同意使用</div>
+                    </div>
+                    <!-- <div class="center-key" style="margin-top: 42px;">
+                      验收日期: &nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp; 日
+                    </div> -->
+                  </div>
+                </div>
+                <div class="cf border-bottom">
+                  <div class="fl sign right-border" style="width:186.5px">
+                    <div class="sign-text">供货方签字 (预拌混凝土单位)</div>
+                  </div>
+
+                  <div class="fl  sign right-border" style="width:186.5px">
+                    <div class="sign-text">使用方签字 (施工单位)</div>
+                  </div>
+                  <div class="fl  sign" style="width:calc((100% - 375px));" >
+                    <div class="sign-text">见证方签字 (监理/建设单位)</div>
+                  </div>
+                </div>
+                <div class="cf">
+                  <div class="fl right-border" style="width:186.5px;height: 32px;float: left;">
+                  </div>
+                  <div class="fl right-border" style="width:186.5px;height: 32px;float: left;">
+                  </div>
+                  <div class="fl" style="width:calc((100% - 375px));height: 32px;float: left;">
+                  </div>
+                </div>
+              </div>
+              <div style="padding-left: 18px;">
+                <span class="center-key">签收人/电话</span>  <span>{{receiverTel}}</span>
+              </div>
+              <div style="padding-left: 18px;" class="paper-footer cf">
+                <div class="fl" style="padding-left:11px">{{footvalue}}</div>
+                <div class="fr" style="padding-right:11px">{{footTip}}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="templete4" v-if="printTempleType == 4">
+            <div class="mixbox pagenext mt10 hide"  :class="{'no-print':printtest==true,'oneLineStyle':contextOneLine==1}"  v-for="(pageconfig,index) in allPagerSet">
+              <div class="header cf">
+                <div class="fl logo-container" :style="logoContainerStyle(pageconfig.showQr)">
+                  <div class="logo" v-if="logo == './images/'">
+                    <span class="company" style="padding-left:0px"> {{bigTitle}}</span>
+                  </div>
+                  <div class="logo" v-if="logo != './images/'">
+                    <img :src="logo" width="30px" height="25px">
+                    <span class="company"> {{bigTitle}}</span>
+                  </div>
+                  <div>
+                    <div class="mix-name" v-if="pageconfig.showSubTitle==1">{{subTitle}}</div>
+                    <div v-if="pageconfig.showSubTitle==1" class="task-no">任务单号 {{taskNo}}</div>
+                    <div v-if="pageconfig.showSubTitle!=1" class="task-no" style="float: left">任务单号{{taskNo}}</div>
+                  </div>
+                </div>
+                <div class="pl11 fr">
+                  <!-- <div class="item-order-no f15">{{itemOrderNo}}</div>
+                  <div class="print-time f11">打印时间: {{printTime}}</div> -->
+                  <div v-if="pageconfig.showQs==1">{{qs}}</div>
+                  <div class="cname">{{deliverCompanyName}}</div>
+                  <div class="f15 tickettag">{{pageconfig.title}}</div>
+                </div>
+
+                <div v-if="pageconfig.showQr==1"  class="barcode fr batchqrcode" ref="batchqrcode"></div>
+
+              </div>
+              <ul class="basic-info">
+                <li class="fhquantity">
+                  <div class="title">本车方量</div>
+                  <div class="content">{{fhQuantity}}</div>
+                </li>
+                <li class="cartimes">
+                  <div class="title">车数</div>
+                  <div class="content">{{fhCarTimes}}</div>
+                </li>
+                <li class="counts">
+                  <div class="title">累计发货量</div>
+                  <div class="content">{{totalQuantity}}</div>
+                </li>
+                <li class="part" v-if="tpzTldSplit == 0">
+                  <span class="title">{{tpz}}</span>
+                  <span class="content">{{tld}}</span>
+                </li>
+                <div class="part tpzTldSplit" style="height: 100%;display: flex" v-if="tpzTldSplit == 1">
+                  <li class="counts-inline" v-if="tpzTldSplit == 1">
+                    <span class="title">标号</span>
+                    <span class="content">{{tpz}}</span>
+                  </li>
+                  <li class="counts-inline" v-if="tpzTldSplit == 1">
+                    <span class="title">坍落度</span>
+                    <span class="content">{{tld}}</span>
+                  </li>
+                </div>
+              </ul>
+              <div class="detail">
+                <span class="company" :style="contextOneLine==1?'width:100%':'width:50%'"><em>施工单位</em>：{{receiveCompanyName}}</span>
+                <span class="contact"><em style="width: auto;">现场联系人</em>：{{receiverTel}}</span>
+                <span class="cf"><em>工程名称</em>：{{projectName}}</span>
+                <span class="cf"><em>工程地址</em>：{{projectAdd}}</span>
+              </div>
+              <div class="detail">
+                <span><em>浇筑部位</em>：{{jzbw}}</span>
+                <span><em>浇筑方式</em>：{{jzfs}}</span>
+                <span><em>备注</em>：{{remark}}</span>
+                <span v-if="showPhbNo"><em>配合比号</em>：{{phbNo}}</span>
+              </div>
+              <div class="detail cf" v-if="contextOneLine==0">
+                <span class="carnumber"><em>车号</em>：{{carNumber}}</span>
+                <span class="mixtable"><em>拌台号</em>：{{mixtable}}</span>
+                <span class="driver"><em>司机</em>：{{driverName}}</span>
+                <span class="fhy"><em>发货员</em>：{{fhy}}</span>
+                <span class="cf" v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                    <span v-if="salesPerson" class="salesPerson"><em>销售员</em>：{{salesPerson}}</span>
+                    <span v-if="signedBy" class="signedBy"><em>可签收人</em>：{{signedBy}}</span>
+              </div>
+              <div class="detail cf" v-if="contextOneLine==1">
+                <span class="carnumber" style="width: 100%"><em>车号</em>：{{carNumber}}</span>
+                <span class="driver" style="width: 100%"><em>司机</em>：{{driverName}}</span>
+                <span class="mixtable" style="width: 100%"><em>拌台号</em>：{{mixtable}}</span>
+                <span class="fhy" style="width: 100%"><em>发货员</em>：{{fhy}}</span>
+                <span class="cf" v-if="showDistance"><em>运距</em>：{{transportDistance}}</span>
+                    <span v-if="salesPerson" class="salesPerson"><em>销售员</em>：{{salesPerson}}</span>
+                    <span v-if="signedBy" class="signedBy"><em>可签收人</em>：{{signedBy}}</span>
+              </div>
+              <div class="detail cf" v-if="pageconfig.signShow==1">
+                <span class="sign">收货人签名：</span>
+                <span class="remark"><em>签收备注</em>：</span>
+              </div>
+              <div class="detail cf">
+                <span class="half"><em>合同编号</em>：{{contractNo}}</span>
+                <span class="itemorderno" :style="contextOneLine==1?'width:100%':'width:50%'"><em>小票号</em>：{{itemOrderNo}}</span>
+                <span class="createtime"><em>发货时间</em>：{{itemCreateTime}}</span>
+              </div>
+              <div class="detail cf pageavoid"  v-html="footTip">
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!--endprint-->
+        <div class="loading-refresh" v-show="loadingRefresh"></div>
+        <div class="loadingbox cf no-print" v-show="loading">
+          <div class="scan-ok">{{tips}}</div>
+          <div class="loading">
+            <img src="images/loading.gif">
+            <!-- <div class="loading-animate">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div> -->
+          </div>
+        </div>
+        <div class="choose-bt-type no-print" v-show="pageState == 0 && printerStatus == 1 && authStatus == 1">
+          <!-- <span class="bt-tips">取票码取票</span> -->
+          <div class="input-code-type" @click="keyboardShow == 0 ? openCodeBox() : closeCodeBox()">输入取票码</div>
+        </div>
+        <div class="code-keyboard no-print" v-show="pageState == 0 && printerStatus == 1 && authStatus == 1">
+          <div class="keyboard-title">取件码取票</div>
+          <div class="keyboard-cancel" @click="closeCodeBox">取&nbsp;&nbsp;&nbsp;消</div>
+          <div class="keyboard-message">{{keyboardMessage}}</div>
+          <div class="keyboard-box">
+            <!-- <input class="keyboard-input input" placeholder="请输入取票码" v-model="checkStr" /> -->
+            <div class="keyboard-input input" :class="{'error-input':keyboardMessage}" placeholder="请输入取票码"/>{{checkStr}}</div>
+            <div class="simple-keyboard"></div>
+          </div>
+        </div>
+        <!-- <iframe id="iframe" class="hide no-print"></iframe> -->
+        <audio class="hide no-print" id="audio"><source src="media/qrCode.wav" type="audio/wav"></audio>
+      </div>
+      <script type="text/javascript">
+        var vm = new Vue({
+            el: '#app',
+            data: {
+              queue:new Map(),
+              deliverNames : {'8579':'01','8466':'0','8581':'02'},
+              inputcode : '',
+              pagedata : '',
+              deliverCompanyId : 0,
+              deliverCompanyName : '',
+              itemOrderNo : '',
+              printDate : '',
+              fhQuantity : 0,
+              fhCarTimes : 1,
+              totalQuantity : 0,
+              tpz : '',
+              otherTpz:'',
+              tld : '',
+              receiveCompanyName : '',
+              receiverTel : '',
+              projectName : '',
+              projectAdd : '',
+              jzbw : '',
+              jzfs : '',
+              transportDistance:'',
+              phbNo:'',
+              taskNo : '',
+              itemCreateTime : '',
+              itemCreateTimeStamp: 0,
+              carNumber : '',
+              carLisense : '',
+              driverName : '',
+              remark :'',
+              printTime:'',
+              fhy:'',
+                salesPerson:'',//销售员
+                signedBy:'',//签收人
+              mixtable:'',
+              qrstr:'',
+              needprint:1,
+              signQRprefix:'http://sign.mytongche.com/?id=',
+              // printStatus:0, // 0 未打印  2 打印倒计时中,
+              pageState:0, // 0 广告 1 识别成功，请等待 2 无需打印 3 无法识别 4 打印完成倒计时
+              inputSwitch:1,
+              processedDataList:[],
+              printCountDownSecond:0,
+              gbkstr:'',
+              timestr:'',
+              advertiseIntervalTimer:'',
+              audio:'',
+              loading:false,
+              loadingRefresh:false,
+              timeInterVal:'',
+              errorMsg:'',
+              tips:'',
+              entercount:0,
+              handleStateTimer:'',
+              pumpPrint:true,
+              pumpTips:'',
+              tyhost:'',
+              apihost:'http://'+window.location.host,
+              localhost:'http://127.0.0.1:7070',
+              localapi:{
+                serial:'/printer/serial',
+                status:'/printer/status',
+                mileage:'/printer/mileage',
+                restart:'/browser/restart'
+              },
+              api:{
+                auth:'/print/auth',
+                keepalive:'/print/keepalive',
+                scancode:'/print/scancode',
+                printcallback:'/print/callback',
+                logScan:'/print/logscan',
+                register:'/print/register',
+                reset:'/print/reset',
+                checkcode:'/print/checkcode'
+              },
+              keepaliveInterval:'',
+              encodeItemId:'',
+              websocket: null,
+              printerStatus:1, //打印机状态 1 - 正常 2 - 异常 3 - 打印机缺纸 4 - 卡纸 ;
+              printage:0,
+              authStatus:1,//授权状态
+              serviceTel:'',
+              zjy:'',
+              receiverName:'',
+              servicer:'',
+              dev:0,
+              websockerurl : 'ws://127.0.0.1:7070/ws',
+              printInterval:'',
+              websocketSuccess:false,
+              currentItemMd5:'',
+              logo:'./images/logo.png',
+              bigTitle:'',
+              subTitle:'',
+              bottomName:'',
+              bottomImg:'./images/bottom.png',
+              qs:'QR/S8.5-11(1)',
+              ver:'',
+              driverpage:0,// 司机联
+              cgpage:0,
+              cwpage:0,
+              socketLinkCount:0,
+              pumpPaperTitle:'泵车联',
+              receivePaperTitle:'收货单位存',
+              mixPaperTitle:'拌站存',
+              driverPaperTitle:'司机存',
+              cgPaperTitle:'',
+              cwPaperTitle:'财务联',
+              clientId:0,
+              printtest:false,
+              keepaliveCount:0,
+              printerCompanyName:'',
+              clientName:'',
+              linkInfo : '',
+              showDistance: 0,
+              showPhbNo:0,
+              muiltSign:0,
+              companyAddress:'',
+              planQuantity:'',
+              contractNo:'',
+              scanStr:'',
+              checkStr:'',
+              myKeyboard:'',
+              keyboardMessage:'',
+              keyboardShow:0,
+              printTempleType:0,
+              pagerSet:[],
+              allPagerSet:[],
+              footTip:'',
+              showQr:1,
+              szgg:'',
+              authErrorStr:'打印机未授权',
+              bigJzfs:1,
+              forceCloud:0,
+              tpzTldSplit:0,
+              contextOneLine:0,
+              showCheckQr:0,
+              checkCodeStr:''
+            },
+            watch: {
+              pageState: "advertiseShow",
+              // loading:"loadingWatch",
+              authStatus:function(newval,oldval){
+                if(newval == 1 && oldval == 0){
+                  this.initAdv();
+                }
+              },
+              printerStatus:function(newval,oldval){
+                if(newval == 1 && oldval != 1){
+                  this.initAdv();
+                }
+              }
+            },
+            computed:{
+              ticketCreateDate:function(){
+                if(!this.itemCreateTime){
+                  return '';
+                }else{
+                  return this.itemCreateTime.substr(0,10);
+                }
+              },
+              ticketCreateTime:function(){
+                if(!this.itemCreateTime){
+                  return '';
+                }else{
+                  return this.itemCreateTime.substr(10);
+                }
+              },
+              bigCssStyle:function (){
+                if(this.showCheckQr){
+                  return 'big-header'
+                }else{
+                  return ''
+                }
+              }
+            },
+            methods: {
+              logoContainerStyle(showQr){
+                if(showQr == 0){
+                  return {'width':'400px'}
+                }else{
+                  return ''
+                }
+              },
+                openCodeBox :function(){
+                  var self = this;
+                  self.checkStr = '';
+                  document.querySelector(".input").value = '';
+                  self.myKeyboard.clearInput();
+                  $(".code-keyboard").animate({bottom: '0px'});
+                  self.keyboardShow = 1;
+                  self.keyboardMessage = '';
+                  self.inputSwitchOff();
+                },
+                closeCodeBox:function(){
+                  var self = this;
+                  self.checkStr = '';
+                  document.querySelector(".input").value = '';
+                  self.myKeyboard.clearInput();
+                  $(".code-keyboard").animate({bottom: '-100%'});
+                  self.keyboardShow = 0;
+                  //self.queue = new Map();
+                  $("#testinput").val('');
+                  self.keyboardMessage = '';
+                  self.inputSwitchOn();
+                },
+                unzip:function(b64Data) {
+                  var data = ''
+                  try {
+                    var strData = atob(b64Data);
+                    data = pako.inflate(strData, {
+                      to: 'string'
+                    });
+
+                  } catch(ex) {
+
+                  }
+                  return data;
+                },
+
+                testLocalStorage:function(){
+                  var test = '0123456789';
+                  var add = function(num) {
+                      num += num;
+                      if(num.length == 10240) {
+                          test = num;
+                          return;
+                      }
+                      add(num);
+                  }
+                  add(test);
+                  var sum = test;
+                  var show = setInterval(function(){
+                      sum += test;
+                      try {
+                          window.localStorage.removeItem('test');
+                          window.localStorage.setItem('test', sum);
+                          console.log(sum.length / 1024 + 'KB');
+                      } catch(e) {
+                          console.log(sum.length / 1024 + 'KB超出最大限制');
+                          clearInterval(show);
+                      }
+                  }, 0.1)
+                },
+                clearLocalStorage:function(){
+                  var processedStr = localStorage.getItem('processedItems');
+                  var processedData = '';
+                  var used = 0;
+                  if(processedStr){
+                    processedData = JSON.parse(processedStr);
+                    used = (processedStr.length / 1024).toFixed(2); // KB
+                  }
+                  console.log('used',used+'KB');
+                  if(used>0 && used > 200){
+                    var nowtimestamp = new Date().getTime();
+                    for(var key  in processedData){
+                      if(nowtimestamp/1000 - processedData[key]/1000  > 86400 * 3){
+                        delete processedData[key];
+                      }
+                    }
+                    localStorage.setItem('processedItems',JSON.stringify(processedData));
+                  }
+                },
+                initAdv:function(){
+                  clearInterval(this.advertiseIntervalTimer);
+                  $("#steptitle1").show();
+                  $("#stepbody1").css('display','inline');
+                  $("#steptitle2").hide();
+                  $("#stepbody2").hide();
+                  this.setAdvertiseInterval();
+                },
+                getUrlKey(name,url){
+                　　return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(url) || [, ""])[1].replace(/\+/g, '%20')) || null
+                },
+                initWebSocket(){ //初始化websocket
+                  if(this.socketLinkCount < 10){
+                    var wsuri = this.websockerurl;
+                    this.websocket = new WebSocket(wsuri);
+                    this.websocket.onmessage = this.websocketonmessage;
+                    this.websocket.onopen = this.websocketonopen;
+                    this.websocket.onerror = this.websocketonerror;
+                    this.websocket.onclose = this.websocketclose;
+                    this.socketLinkCount++;
+                  }
+                },
+                websocketonopen(){ //连接建立之后执行send方法发送数据
+                  console.log('websocket open');
+                  this.websocketSuccess = true;
+                  this.socketLinkCount = 0;
+                  // var open = 'ok';
+                  // this.websocketsend(open);
+                },
+                websocketonerror(){//连接建立失败重连
+                  this.websocketSuccess = false;
+                  this.initWebSocket();
+                },
+                websocketonmessage(e){ //数据接收
+                  var receiveData = JSON.parse(e.data);
+                  console.log(receiveData);
+                  if(receiveData.event == 'status_change'){
+                    if(receiveData.new == '待机'){
+                      this.printerStatus = 1;
+                      if(receiveData.old == '打印中' && this.printCountDownSecond < 6 && this.printCountDownSecond > 0){
+                        // 打印完成
+                          this.printCountDownSecond = 0;
+                      }
+                    }else if(receiveData.new == '打印中'){
+                      this.printerStatus = 1;
+                    }else{
+                      if(this.currentItemMd5){
+                        this.printCountDownSecond = 0;
+                        var processedStr = localStorage.getItem('processedItems');
+                        var processedData = '';
+                        if(processedStr){
+                          processedData = JSON.parse(processedStr);
+                        }
+                        if(processedData && processedData[this.currentItemMd5]){
+                          processedData[this.currentItemMd5] = 0;
+                          this.currentItemMd5 = '';
+                          localStorage.setItem('processedItems',JSON.stringify(processedData));
+                        }
+                      }
+                      if(receiveData.new == '缺纸' || receiveData.new == '缺纸并开启印字头' || receiveData.new == '缺碳带并同时缺纸' || receiveData.new == '缺碳带、缺纸并开启印字头'){
+                        this.printerStatus = 3;
+                      }else if(receiveData.new == '卡纸' || receiveData.new == '卡纸并开启印字头' || receiveData.new == '缺碳带并同时卡纸' || receiveData.new == '缺碳带、卡纸并开启印字头'){
+                        this.printerStatus = 4;
+                      }else{
+                        // 其他各种错误
+                        this.printerStatus = 2;
+                      }
+                    }
+                  }
+                  if(receiveData.event == 'mileage_change'){
+                    this.printage = receiveData.new;
+                  }
+                },
+                websocketsend(data){//数据发送
+                  this.websocket.send(data);
+                },
+                websocketclose(e){  //关闭
+                  console.log('断开连接',e);
+                  this.websocketSuccess = false;
+                },
+                getSerial:function(){
+                  var self = this;
+                  $.ajax(
+                    {
+                      url: self.localhost+self.localapi.serial,
+                      data: {},
+                      type: 'get',
+                      success: function(res){
+                        if(res.code == 200){
+                          if(res.data){
+                            self.clientId = res.data.trim();
+                            localStorage.setItem('clientId',self.clientId);
+                          }
+                        }else{
+                        }
+                      },
+                      error: function(res){
+                      }
+                    });
+                },
+                auth:function(){
+                  var self = this;
+                  self.clientId = localStorage.getItem('clientId');
+                  $.ajax(
+                  {
+                    url: self.localhost+self.localapi.serial,
+                    data: {},
+                    type: 'get',
+                    async: false,
+                    success: function(res){
+                      if(res.code == 200){
+                        if(res.data){
+                          self.clientId = res.data.trim();
+                          localStorage.setItem('clientId',self.clientId);
+                        }
+                      }else{
+                      }
+                    },
+                    error: function(res){
+                    }
+                  });
+                  var clientId = self.clientId;
+                  if(!clientId || clientId == 'undefined'){
+                    self.authStatus = 0;
+                    localStorage.setItem('authStatus',0);
+                    self.clientId = '';
+                    localStorage.setItem('clientId','');
+                    return false;
+                  }
+                  var data = {
+                    'clientId':clientId,
+                    'mode':self.dev
+                  }
+                  $.ajax(
+                    {
+                      url: self.apihost+self.api.auth,
+                      data: data,
+                      type: 'post',
+                      success: function(res){
+                        if(res.code == 200){
+                          self.authStatus = 1;
+                          self.serviceTel = res.result.serviceTel;
+                          self.servicer = res.result.servicer;
+                          self.token = res.result.token;
+                          self.deliverCompanyId = res.result.deliverCompanyId;
+                          self.tyhost = res.result.tyhost;
+
+                       	  self.driverpage = res.result.driverpage;
+                          localStorage.setItem('driverpage',res.result.driverpage);
+
+                    	    self.cgpage = res.result.cgpage;
+                          localStorage.setItem('cgpage',res.result.cgpage);
+                          self.cwpage = res.result.cwpage;
+                          localStorage.setItem('cwpage',res.result.cwpage);
+
+                          // 模板类型
+                          self.printTempleType = res.result.printTempleType;
+                          localStorage.setItem('printTempleType',res.result.printTempleType);
+
+                          self.companyAddress=res.result.companyAddress;
+                          localStorage.setItem('companyAddress',res.result.companyAddress);
+                          //self.driverpage = res.result.driverpage;
+                          //self.cgpage = res.result.cgpage;
+                          self.clientName = res.result.clientName;
+                          self.printerCompanyName = res.result.printerCompanyName;
+                          self.linkInfo = res.result.linkInfo;
+                          self.showDistance = res.result.showDistance;
+                          self.showPhbNo = res.result.showPhbNo;
+                          self.muiltSign = res.result.muiltSign;
+                          if(res.result.ver){
+                            self.ver = res.result.ver;
+                          }
+                          var delivers = res.result.deliverNames;
+                          delivers.forEach(function(v,k){
+                            self.deliverNames[v.id] = v.name;
+                          })
+                          if(res.result.logo){
+                            self.logo = res.result.logo;
+                            localStorage.setItem('logo',res.result.logo);
+                          }
+                          if(res.result.bigTitle){
+                            self.bigTitle = res.result.bigTitle;
+                            localStorage.setItem('bigTitle',res.result.bigTitle);
+                          }
+                          if(res.result.subTitle){
+                            self.subTitle = res.result.subTitle;
+                            localStorage.setItem('subTitle',res.result.subTitle);
+                          }
+                          if(res.result.bottomName){
+                            self.bottomName = res.result.bottomName;
+                            localStorage.setItem('bottomName',res.result.bottomName);
+                          }
+                          if(res.result.bottomImg){
+                            self.bottomImg = res.result.bottomImg;
+                            localStorage.setItem('bottomImg',res.result.bottomImg);
+                          }
+                          if(res.result.qs){
+                            self.qs = res.result.qs;
+                            localStorage.setItem('qs',res.result.qs);
+                          }
+                          if(res.result.pumpPaperTitle){
+                            self.pumpPaperTitle = res.result.pumpPaperTitle;
+                            localStorage.setItem('pumpPaperTitle',res.result.pumpPaperTitle);
+                          }
+                          if(res.result.receivePaperTitle){
+                            self.receivePaperTitle = res.result.receivePaperTitle;
+                            localStorage.setItem('receivePaperTitle',res.result.receivePaperTitle);
+                          }
+                          if(res.result.mixPaperTitle){
+                            self.mixPaperTitle = res.result.mixPaperTitle;
+                            localStorage.setItem('mixPaperTitle',res.result.mixPaperTitle);
+                          }
+                          if(res.result.driverPaperTitle){
+                            self.driverPaperTitle = res.result.driverPaperTitle;
+                            localStorage.setItem('driverPaperTitle',res.result.driverPaperTitle);
+                          }
+                          if(res.result.cgPaperTitle){
+                            self.cgPaperTitle = res.result.cgPaperTitle;
+                            localStorage.setItem('cgPaperTitle',res.result.cgPaperTitle);
+                          }
+                          if(res.result.cwPaperTitle){
+                            self.cwPaperTitle = res.result.cwPaperTitle;
+                            localStorage.setItem('cwPaperTitle',res.result.cwPaperTitle);
+                          }
+                          localStorage.setItem('authStatus',1);
+                          localStorage.setItem('lastLoginTime',new Date().getTime());
+                          localStorage.setItem('token',res.result.token);
+                          localStorage.setItem('serviceTel',res.result.serviceTel);
+                          localStorage.setItem('servicer',res.result.servicer);
+
+                          self.pagerSet = res.result.pagerSet;
+                          self.allPagerSet = res.result.allPagerSet;
+                          self.footTip = res.result.footTip;
+                          self.showQr = res.result.showQr;
+                          self.bigJzfs = res.result.bigJzfs;
+                          self.tpzTldSplit = res.result.tpzTldSplit;
+                          self.contextOneLine = res.result.contextOneLine;
+                          self.showCheckQr = res.result.showCheckQr;
+                        }else{
+                          if(res.code == 501){
+                            self.authStatus = 0;
+                            localStorage.setItem('authStatus',0);
+                            self.authErrorStr='打印机未授权';
+                          }if(res.code == 502){
+                            self.authStatus = 0;
+                            localStorage.setItem('authStatus',0);
+                            self.authErrorStr='该打印机未被砼行注册';
+                          }else{
+                            if(navigator.onLine){
+                              self.authStatus = 0;
+                              localStorage.setItem('authStatus',0);
+                              self.authErrorStr='该打印机授权失败';
+                            }
+                          }
+                        }
+                      }
+                    });
+                    self.keepaliveInterval = setInterval(() => {
+                      if(navigator.onLine){
+                        self.keepalive();
+                      }
+                    }, 10000);
+                },
+                keepalive:function(){
+                  var self =this;
+                  var clientId = self.clientId;
+                  var token = self.dev == 1 ? '135':self.token;
+                  var oldver = self.ver;
+                  var taskcachedata = localStorage.getItem('taskcachedata');
+                  var vehiclecachedata = localStorage.getItem('vehiclecachedata');
+                  var drivercachedata = localStorage.getItem('drivercachedata');
+                  var cachedata = [];
+                  self.keepaliveCount++;
+                  if(taskcachedata){
+                    taskcachedata = JSON.parse(taskcachedata);
+                    for(var t in taskcachedata){
+                      cachedata.push({
+                          'id':taskcachedata[t]['cacheId'],
+                          'type':1,
+                          'lasttime':taskcachedata[t]['lasttime']
+                        }
+                      )
+                    }
+                  }else{
+                    taskcachedata = {};
+                  }
+                  if(vehiclecachedata){
+                    vehiclecachedata = JSON.parse(vehiclecachedata);
+                    for(var v in vehiclecachedata){
+                      cachedata.push({
+                        'id':vehiclecachedata[v]['cacheId'],
+                        'type':2
+                      })
+                    }
+                  }else{
+                    vehiclecachedata = {};
+                  }
+                  if(drivercachedata){
+                    drivercachedata = JSON.parse(drivercachedata);
+                    for(var d in drivercachedata){
+                      cachedata.push({
+                        'id':drivercachedata[d]['cacheId'],
+                        'type':3
+                      })
+                    }
+                  }else{
+                    drivercachedata = {};
+                  }
+                  var data = {};
+                  if(self.keepaliveCount%30 == 0){
+                    data = {
+                      'clientId':clientId,
+                      'token':token,
+                      'printstatus':self.printerStatus,
+                      'printage':self.printage,
+                      'cachedata':JSON.stringify(cachedata),
+                      'cacheFlag':1
+                    }
+                  }else{
+                    data = {
+                      'clientId':clientId,
+                      'token':token,
+                      'printstatus':self.printerStatus,
+                      'printage':self.printage,
+                      'cacheFlag':0
+                    }
+                  }
+
+                  $.ajax(
+                  {
+                    url: self.apihost+self.api.keepalive,
+                    data: data,
+                    type: 'POST',
+                    success: function(res){
+                      if(res.code == 200){
+                        if(self.authStatus == 0){
+                          self.authStatus = 1;
+                          localStorage.setItem('authStatus',1);
+                        }
+                        if(res.result.ver && navigator.onLine){
+                          if(res.result.ver != oldver){
+                            if(self.printerStatus == 1 && self.pageState == 0 && self.authStatus == 1){
+                              self.ver = res.result.ver;
+                              localStorage.setItem('ver',res.result.ver);
+                              self.refresh();
+                            }
+                          }
+                        }
+                        if(res.result.cacheFlag == 1 && res.result.cacheList){
+                          var flushtaskId = [];
+                          var flushvehicleId = [];
+                          var flushdriverId = [];
+
+                          var flushList = res.result.cacheList;
+                          for(var i = 0;i < flushList.length;i++){
+                            let flushtype = flushList[i]['cacheType'];
+                            let flushId = flushList[i]['cacheId'];
+                            let keyId = 'k_'+flushId;
+                            if(flushtype == 1){
+                              if(taskcachedata && taskcachedata[keyId]){
+                                taskcachedata[keyId]['data'] = flushList[i]['cacheData'];
+                                taskcachedata[keyId]['lasttime'] = flushList[i]['cacheTime'];
+                              }else{
+                                taskcachedata[keyId]={
+                                  'data':flushList[i]['cacheData'],
+                                  'cacheId':flushList[i]['cacheId'],
+                                  'lasttime':flushList[i]['cacheTime']
+                                }
+                                // taskcachedata[flushId]['data'] =
+                                // taskcachedata[flushId]['cacheId'] =
+                              }
+                            }else if(flushtype == 2){
+                              if(vehiclecachedata[keyId]){
+                                vehiclecachedata[keyId]['data'] = flushList[i]['cacheData'];
+                                vehiclecachedata[keyId]['lasttime'] = flushList[i]['cacheTime'];
+                              }else{
+                                vehiclecachedata[keyId]={
+                                  'data':flushList[i]['cacheData'],
+                                  'cacheId':flushList[i]['cacheId'],
+                                  'lasttime':flushList[i]['cacheTime']
+                                }
+                                // vehiclecachedata[flushId]['data'] = flushList[i]['cacheData'];
+                                // vehiclecachedata[flushId]['cacheId'] = flushList[i]['cacheId'];
+                              }
+                            }else if(flushtype == 3){
+                              if(drivercachedata[keyId]){
+                                drivercachedata[keyId]['data'] = flushList[i]['cacheData'];
+                                drivercachedata[keyId]['lasttime'] = flushList[i]['cacheTime'];
+                              }else{
+                                drivercachedata[keyId]={
+                                  'data':flushList[i]['cacheData'],
+                                  'cacheId':flushList[i]['cacheId'],
+                                  'lasttime':flushList[i]['cacheTime']
+                                }
+                                // drivercachedata[flushId]['data'] = flushList[i]['cacheData'];
+                                // drivercachedata[flushId]['cacheId'] = flushList[i]['cacheId'];
+                              }
+                            }
+                          }
+                        }
+                        if(res.result.cacheFlag == 1 && res.result.delCacheList){
+                          var deltaskId = [];
+                          var delvehicleId = [];
+                          var deldriverId = [];
+
+                          var delList = res.result.delCacheList;
+                          for(var i = 0;i < delList.length;i++){
+                            let deltype = delList[i]['cacheType'];
+                            let delId =  delList[i]['cacheId'];
+                            var keyId = 'k_'+delId;
+                            if(deltype == 1){
+                              if(taskcachedata[keyId]){
+                                delete taskcachedata[keyId];
+                              }
+                            }else if(deltype == 2){
+                              if(vehiclecachedata[keyId]){
+                                delete vehiclecachedata[keyId];
+                              }
+                            }else if(deltype == 3){
+                              if(drivercachedata[keyId]){
+                                delete drivercachedata[keyId];
+                              }
+                            }
+                          }
+                        }
+
+                        if(res.result.cacheFlag == 1 && (res.result.cacheList.length>0 || res.result.delCacheList.length>0)){
+                          localStorage.setItem('taskcachedata',JSON.stringify(taskcachedata));
+                          localStorage.setItem('vehiclecachedata',JSON.stringify(vehiclecachedata));
+                          localStorage.setItem('drivercachedata',JSON.stringify(drivercachedata));
+                        }
+                      }else if(res.code == 401){
+                        self.authStatus = 0;
+                        localStorage.setItem('authStatus',0);
+                      }
+                    }
+                  });
+                },
+                printcallback:function(){
+                  var self =this;
+                  if(self.websocketSuccess){
+                    $.ajax(
+                    {
+                      url: self.localhost+self.localapi.mileage,
+                      data: {},
+                      type: 'get',
+                      async: false,
+                      success: function(res){
+                        if(res.code == 200){
+                          if(res.data){
+                            self.printage = res.data;
+                          }
+                        }else{
+                        }
+                      },
+                      error: function(res){
+                      }
+                    });
+                  }
+                  var clientId = self.clientId;
+                  var token = self.dev == 1 ? '135':self.token;
+                  var data = {
+                    'clientId':clientId,
+                    'token':token,
+                    'itemOrderNo':self.itemOrderNo,
+                    'companyId':self.deliverCompanyId,
+                    'printage':self.printage,
+                    'scanStr':self.scanStr
+                  }
+                  $.ajax(
+                  {
+                    url: self.apihost+self.api.printcallback,
+                    data: data,
+                    type: 'POST',
+                    success: function(res){
+                      if(res.code == 200){
+                        self.scanStr = '';
+                      }else{
+                        //alert(res.message);
+                      }
+                    }
+                  });
+                },
+                refresh:function(){
+                  this.loadingRefresh =true;
+                  location.reload();
+                },
+                logScan:function(inputstr){
+                  var self =this;
+                  var clientId = self.clientId;
+                  var token = self.dev == 1 ? '135':self.token;
+                  var data = {
+                    'clientId':clientId,
+                    'token':token,
+                    'encodeStr':inputstr
+                  }
+                  $.ajax(
+                  {
+                    url: self.apihost+self.api.logScan,
+                    data: data,
+                    type: 'post',
+                    success: function(res){
+                      if(res.code == 200){
+                      }else{
+                        if(res.code == 401){
+                          // todo 登出
+                        }
+                      }
+                    }
+                  });
+                },
+                handleState:function(){
+                  //pageState  0 广告 1 识别成功，等待打印 2 无需打印 3 无法识别 4 打印完成倒计时
+                  var self = this;
+                  clearTimeout(self.handleStateTimer);
+                  if(self.authStatus != 1){
+                    // 未授权
+                    self.errorMsg = '';
+                    self.queue = new Map();
+                    // self.printStatus = 0;
+                    self.loading = false;
+                    self.tips = '';
+                    if(!self.clientId || self.clientId == 'undefined'){
+                      self.clientId = localStorage.getItem('clientId');
+                    }
+                    if((!self.clientId || self.clientId == 'undefined') && self.websocketSuccess){
+                      // no serial
+                      self.getSerial();
+                    }else{
+                      $("#testinput").focus();
+                    }
+                  }else if(self.printerStatus != 1){
+                    // 打印机没有正常工作
+                    self.errorMsg = '';
+                    self.queue = new Map();
+                    // self.printStatus = 0;
+                    self.loading = false;
+                    self.tips = '';
+                  }else{
+                    if(self.pageState == 0){
+                      $("#testinput").focus();
+                      if(self.queue.size > 0 && self.keyboardShow == 0){
+                        self.playAudio();
+                        self.pageState = 1;
+                      }else{
+                        self.errorMsg = '';
+                      }
+                    }else if(self.pageState == 1){
+                      var dataqueue = new Map();
+                      self.queue.forEach(function(v,k){
+                        dataqueue.set(k,v);
+                      });
+                      var originProcessedStr = localStorage.getItem('processedItems');
+                      var originProcessedData = {};
+                      if(originProcessedStr){
+                        originProcessedData = JSON.parse(originProcessedStr);
+                      }
+                      var recognized = true;
+                      dataqueue.forEach(function(v,k){
+                        self.encodeItemId = '';
+                        var indata = v;
+                        // var patt = /TsT[\s\S]*TeT/;
+                        var patt = new RegExp(/(TsT(?!.*?TsT).*?TeT)+?/g);
+                        var matchstr = indata.match(patt);
+                        var sourcemd5 = $.md5(indata);
+                        var matchdata = '';
+                        if(!matchstr){
+                          // simple model
+                          var splitdata = indata.split('id=');
+                          if(splitdata.length == 2){
+                            // sourcemd5 = $.md5(indata);
+                            matchdata = indata;
+                            self.encodeItemId = indata;
+                          }
+                        }else{
+                          // sourcemd5 = $.md5(matchstr[0]);
+                          // sourcemd5 = $.md5(indata);
+                          matchdata =  matchstr[0].slice(3,-3);
+                          matchdata = self.unzip(matchdata);
+                        }
+                        console.log(matchdata);
+                        // console.log(indata);
+                        if(matchdata){
+                          if(navigator.onLine){
+                            // 识别OK
+                            self.logScan(indata);
+                          }
+                          var md5str = $.md5(matchdata);
+                          // console.log(sourcemd5);
+                          // console.log(originProcessedData);
+                          // console.log(originProcessedData[sourcemd5]);
+                          // if(!self.isInArray(self.processedDataList,md5str)){
+                          if(!originProcessedData[sourcemd5]){
+                            self.scanStr = indata;
+                            if(!self.encodeItemId){
+                              self.pagedata = matchdata;
+                            }
+                            var analysiscode = self.analysisData(indata);
+                            if(analysiscode != 200){
+                              self.pageState = 3;
+                              if(analysiscode == 501){
+                                self.tips = '未识别小票数据[501]';
+                              }else if(analysiscode == 502){
+                                self.tips = '通信失败[502]';
+                              }else if(analysiscode == 503){
+                                self.tips = '未识别小票数据[503]';
+                              }else if(analysiscode == 504){
+                                self.tips = '格式不正确[504]';
+                              }else if(analysiscode == 505){
+                                self.tips = '格式不正确[505]';
+                              }else if(analysiscode == 506){
+                                self.tips = '小票不存在[506]';
+                              }else if(analysiscode == 507){
+                                self.tips = '一体机无法打印非本站小票[507]';
+                              }else if(analysiscode == 508){
+                                self.tips = '小票编码有误[508]';
+                              }else if(analysiscode == 509){
+                                self.tips = '一体机已离线[509]';
+                              }else if(analysiscode == 510){
+                                self.tips = '小票不可重复打印[510]';
+                              }
+                              else{
+                                self.tips = '未知错误[500]';
+                              }
+                              self.queue = new Map();
+                              return false;
+                            }
+
+                            originProcessedData[sourcemd5] = new Date().getTime();
+                            if(self.needprint == 1){
+                              self.printCountDownSecond = 15;
+                              self.pageState = 4;
+                              self.printTime = self.timestampToTime();
+                              if(self.showQr || self.showCheckQr){
+                                self.makeQrCode();
+                              }
+                              setTimeout(() => {
+                                self.currentItemMd5 = sourcemd5;
+                                self.print();
+                              }, 300);
+                              self.queue = new Map();
+                              return false;
+                            }else{
+                              self.pageState = 2;
+                              self.tips = '已签收的小票不需要打印';
+                              self.queue = new Map();
+                              return false;
+                            }
+                          }else{
+                            originProcessedData[sourcemd5] = new Date().getTime();
+                            self.pageState = 2;
+                            self.tips = '小票只能打印一次哦';
+                            self.queue = new Map();
+                            return false;
+                          }
+                        }else{
+                          // self.processedDataList.push($.md5(v));
+                          // self.processedDataMap.set($.md5(v),new Date().getTime())
+                          originProcessedData[sourcemd5] = new Date().getTime();
+                          recognized = false;
+                        }
+                      })
+                      if(!recognized){
+                        self.pageState = 3;
+                        self.tips = '该二维码没法识别，请用砼行二维码';
+                        self.queue = new Map();
+                      }
+                      dataqueue.forEach(function(v,k){
+                        self.queue.delete(k);
+                      })
+                      localStorage.setItem('processedItems',JSON.stringify(originProcessedData));
+                    }else if(self.pageState == 2){
+                      self.queue = new Map();
+                      setTimeout(() => {
+                        self.pageState = 0;
+                      }, 5000);
+                    }else if(self.pageState == 3){
+                      self.queue = new Map();
+                      setTimeout(() => {
+                        self.pageState = 0;
+                      }, 5000);
+                    }else if(self.pageState == 4){
+                      self.queue = new Map();
+                      if(self.printCountDownSecond <= 1){
+                        self.pageState = 0;
+                      }
+                    }
+
+                    // convert to printState & loading
+                    if(self.pageState == 0){
+                      // self.printStatus = 0;
+                      self.loading = false;
+                      self.tips = '';
+                    }else if(self.pageState == 1){
+                      // self.printStatus = 0;
+                      self.loading = true;
+                      self.tips = '识别成功，请等待打印';
+                    }else if(self.pageState == 2){
+                      // self.printStatus = 0;
+                      self.loading = true;
+                      if(!self.tips){
+                        self.tips = '当前小票无需打印';
+                      }
+                    }else if(self.pageState == 3){
+                      // self.printStatus = 0;
+                      self.loading = true;
+                      if(!self.tips){
+                        self.tips = '请使用正确的二维码扫码打印';
+                      }
+                    }else if(self.pageState == 4){
+                      // self.printStatus = 2;
+                      self.loading = false;
+                      self.tips = '';
+                    }
+                  }
+                  // run next state
+                  if(self.authStatus != 1){
+                    self.handleStateTimer = setTimeout(() => {
+                      self.handleState();
+                    }, 1000);
+                  }else if(self.printerStatus != 1){
+                    self.handleStateTimer = setTimeout(() => {
+                      self.handleState();
+                    }, 100);
+                  }else if(self.pageState == 0 && self.queue.size == 0){
+                    self.handleStateTimer = setTimeout(() => {
+                      self.handleState();
+                    }, 1000);
+                  }else if(self.pageState == 4){
+                    self.handleStateTimer = setTimeout(() => {
+                      self.handleState();
+                    }, 1000);
+                  }else{
+                    self.handleStateTimer = setTimeout(() => {
+                      self.handleState();
+                    }, 100);
+                  }
+                },
+                playAudio:function(){
+                  $('#audio')[0].play();
+                },
+                loadingWatch:function(newval,oldval){
+                    // console.log(newval+'loading');
+                    // console.log(oldval+'loading');
+                },
+                setAdvertiseInterval:function(){
+                  var self = this;
+                  var s = 0;
+                  self.advertiseIntervalTimer = setInterval(() => {
+                    if (s % 5 == 0) {
+                      if ( $("#steptitle1").css("display")=='none' ) {
+                        $("#steptitle2").fadeOut('slow',function(){
+                          $("#steptitle1").fadeIn('slow');
+                        });
+                        $("#stepbody2").fadeOut('slow',function(){
+                          $("#stepbody1").fadeIn('slow');
+                        });
+                      } else {
+                        $("#steptitle1").fadeOut('slow',function(){
+                          $("#steptitle2").fadeIn('slow');
+                        });
+                        $("#stepbody1").fadeOut('slow',function(){
+                          $("#stepbody2").fadeIn('slow');
+                        });
+                      }
+                    }
+                    s++;
+                  }, 1000);
+                },
+                advertiseShow:function(newval,oldval){
+                  if(newval != oldval){
+                    if(newval == 0){
+                        this.setAdvertiseInterval();
+                    }else{
+                      clearInterval(this.advertiseIntervalTimer);
+                    }
+                  }
+                },
+                toGbkBytes : function(str){
+                  var str = $URL.decode(str)
+                  // console.log(str);
+                  var byteArr = new Array();
+                  for(var i=0; i<str.length;i++){
+                    var ch = str.charAt(i);
+                    if(ch == '%'){
+                        var num = str.charAt(i+1) + str.charAt(i+2);
+                        num = parseInt(num,16);
+                        num = num | (-1 << 8);
+                        byteArr.push(num);
+                        i+=2;
+                    }else{
+                      byteArr.push(ch.charCodeAt());
+                    }
+                  }
+                  return byteArr;
+                },
+
+                print : function(){
+                  var self = this;
+                  self.printTime = self.timestampToTime();
+                  // clearInterval(this.advertiseIntervalTimer);
+                  // self.$refs.step1.style.display = 'block';
+                  // self.$refs.step2.style.display = 'none';
+                  window.print();
+                //  document.body.innerHTML=oldstr;
+                  // $("#jgprint").jqprint({
+                  //   'debug':true,
+                  //   'importCSS': false,
+                  // });
+                  self.inputSwitchOff();
+                  // window.frames[0].onbeforeprint = function(e){
+                  //   console.log(' before printing.');
+                  //   self.printStatus = 2;
+                  //   self.loading = true;
+                  // },
+                  // window.frames[0].onafterprint = function(e){
+                  //   self.loading = false;
+
+                  //   self.printCountDown();
+                  //   self.entercount = 0;
+                  //   console.log(' after printing.');
+                  // }
+                },
+                printCountDown: function(){
+                  var self=this;
+                  // console.log(self.printCountDownSecond);
+                  if(self.printerStatus != 1){
+                    if(self.printInterval){
+                      clearInterval(self.printInterval);
+                    }
+                  }
+                  self.printInterval = setInterval(() => {
+                    if (self.printCountDownSecond > 0) {
+                      self.pageState = 4;
+                      self.printCountDownSecond--;
+                      // console.log('countdown',self.printCountDownSecond);
+                    } else {
+                      // console.log('end',self.printCountDownSecond);
+                      self.currentItemMd5 = '';
+                      console.log('beforeclearinterval',self.printInterval);
+
+                      clearInterval(self.printInterval);
+                      console.log('afterclearinterval',self.printInterval);
+
+                      // self.initAdv();
+                      self.pageState = 0;
+                      // self.printStatus = 0;
+                      self.inputSwitchOn();
+                      self.entercount = 0;
+                      $("#testinput").val('');
+                      $("#testinput").focus();
+                      if(self.printCountDownSecond == 0 && self.printerStatus == 1 && navigator.onLine){
+                        self.printcallback();
+                      }
+                    }
+                  }, 1000);
+                },
+                inputSwitchOn: function(){
+                    this.inputSwitch = 1;
+                },
+                inputSwitchOff  : function(){
+                    this.inputSwitch = 0;
+                },
+                makeQrCode:function () {
+                  var self = this;
+                  if(self.printTempleType == 4){
+                    let batchqrlist = self.$refs.batchqrcode;
+                    $(".batchqrcode").text('');
+                    for(let i in batchqrlist){
+                      let qrcode = new QRCode(batchqrlist[i],{
+                        'correctLevel':QRCode.CorrectLevel.L
+                      });
+                      qrcode.clear();
+                      qrcode.makeCode(self.qrstr);
+                    }
+                  }else{
+                    $("#qrcode").text('');
+                    $("#qrcode2").text('');
+                    $("#qrcode3").text('');
+                    if(this.driverpage == 1){
+                      $("#qrcode4").text('');
+                      var qrcode4 = new QRCode(this.$refs.qrcode4,{
+                        'correctLevel':QRCode.CorrectLevel.L
+                      });
+                      qrcode4.clear();
+                      qrcode4.makeCode(this.qrstr);
+                    }
+                    if(this.cgpage == 1){
+                      $("#qrcode5").text('');
+                      var qrcode5 = new QRCode(this.$refs.qrcode5,{
+                        'correctLevel':QRCode.CorrectLevel.L
+                      });
+                      qrcode5.clear();
+                      qrcode5.makeCode(this.qrstr);
+                    }
+                    if(this.cwpage == 1){
+                      $("#qrcode6").text('');
+                      var qrcode6 = new QRCode(this.$refs.qrcode6,{
+                        'correctLevel':QRCode.CorrectLevel.L
+                      });
+                      qrcode6.clear();
+                      qrcode6.makeCode(this.qrstr);
+                    }
+                    var qrcode = new QRCode(this.$refs.qrcode,{
+                      'correctLevel':QRCode.CorrectLevel.L
+                    });
+                    qrcode.clear();
+                    qrcode.makeCode(this.qrstr);
+
+                    var qrcode2 = new QRCode(this.$refs.qrcode2,{
+                      'correctLevel':QRCode.CorrectLevel.L
+                    });
+                    qrcode2.clear();
+                    if(this.showCheckQr == 1 && this.checkCodeStr){
+                      qrcode2.makeCode(this.checkCodeStr);
+                    }else{
+                      qrcode2.makeCode(this.qrstr);
+                    }
+                    var qrcode3 = new QRCode(this.$refs.qrcode3,{
+                      'correctLevel':QRCode.CorrectLevel.L
+                    });
+                    qrcode3.clear();
+                    if(this.showCheckQr == 1 && this.checkCodeStr){
+                      qrcode3.makeCode(this.checkCodeStr);
+                    }else{
+                      qrcode3.makeCode(this.qrstr);
+                    }
+                  }
+                },
+                analysisData : function(inputdata){
+                  var returncode = 500;
+                  if(this.encodeItemId || (inputdata && navigator.onLine)){
+                    // simple
+                    var self =this;
+                    var clientId = self.clientId;
+                    var token = self.dev == 1 ? '135':self.token;
+                    var encodeStr = '';
+                    if(this.encodeItemId){
+                      encodeStr = this.encodeItemId;
+                    }else if(inputdata){
+                      encodeStr = inputdata;
+                    }
+                    var data = {
+                      'clientId':clientId,
+                      'token':token,
+                      'encodeStr':encodeStr
+                    }
+                    var ajaxUrl = self.apihost+self.api.scancode;
+
+                    if(self.forceCloud == 0 && self.tyhost){
+                      ajaxUrl = self.tyhost+self.api.scancode;
+                    }
+                    $.ajax(
+                    {
+                      url: ajaxUrl,
+                      data: data,
+                      type: 'POST',
+                      async: false,
+                      success: function(res){
+                        if(res.code == 200){
+                          returncode = 200;
+                          self.deliverCompanyId = res.result.deliverCompanyId;
+                          if(res.result.replaceRemark == 1){
+                            self.subTitle = res.result.remarks;
+                          }
+                          self.itemOrderNo = res.result.itemOrderNo;
+                          self.fhQuantity = res.result.fhQuantity;
+                          self.fhCarTimes = res.result.fhCarTimes;
+                          self.totalQuantity = res.result.totalQuantity;
+                          self.tpz = res.result.tpz;
+                          self.otherTpz = res.result.otherTpz;
+                          self.tld = res.result.tld;
+                          self.receiveCompanyName = res.result.receiveCompanyName;
+                          self.receiverTel = res.result.receiverTel;
+                          self.projectName = res.result.projectName;
+                          self.projectAdd = res.result.projectAdd;
+                          self.jzbw = res.result.jzbw;
+                          self.jzfs = res.result.jzfs;
+                          if(self.jzfs == '非泵' || self.jzfs == '自备泵'){
+                            self.pumpPrint = false;
+                            self.pumpTips = '非泵';
+                          }else{
+                            self.pumpPrint = true;
+                            self.pumpTips = '';
+                          }
+                          if(self.bigJzfs == 0){
+                            self.pumpPrint = true;
+                            self.pumpTips = '';
+                          }
+                          self.taskNo = res.result.taskNo;
+                          self.itemCreateTimeStamp = res.result.itemOrderCreateTime;
+                          if (res.result.taskRemarks) {
+                            self.bigTitle = res.result.taskRemarks;
+                          }
+                          self.carNumber = res.result.carNumber;
+                          self.carLisense = res.result.carLicenseNo;
+                          self.driverName = res.result.driverName;
+                          self.remark = res.result.remarks;
+                          self.qrstr = self.signQRprefix+res.result.qrstr;
+                          self.needprint = res.result.needprint; // 1 要打印 0 不要打印
+                          self.fhy = res.result.fhy;
+                            self.salesPerson = res.result.salesPerson
+                            self.signedBy = res.result.signedBy
+                          self.mixtable =  res.result.mixtable;
+                          self.deliverCompanyName = self.deliverNames[self.deliverCompanyId];
+                          if(self.itemCreateTimeStamp){
+                            self.itemCreateTime = self.timestampToTime(self.itemCreateTimeStamp);
+                          }
+                          self.transportDistance = res.result.transportDistance;
+                          self.phbNo = res.result.phbNo;
+                          self.planQuantity=res.result.planQuantity;
+                          self.contractNo=res.result.contractNo;
+                          self.szgg = res.result.szgg;
+                          self.forceCloud = 0
+                          self.checkCodeStr = res.result.checkCodeStr
+                        }else{
+                          // 未获取到数据
+                          if(res.code == 502){
+                            // 小票不存在
+                            returncode = 506;
+                          }else if(res.code == 503){
+                            //小票不属于拌站
+                            returncode = 507;
+                          }else if(res.code == 504){
+                            //无法解析小票
+                            returncode = 508;
+                          }else if(res.code == 510){
+                              //无法解析小票
+                              returncode = 510;
+                            }
+                          else{
+                            returncode = 501;
+                          }
+                        }
+                        self.refresh()
+                      },
+                      error:function(XMLHttpRequest, textStatus, errorThrown){
+                        returncode = 502;
+                      }
+
+                    });
+
+                    if(returncode != 200 && self.tyhost && self.forceCloud == 0){
+                      self.forceCloud = 1
+                      self.analysisData(inputdata)
+                    }
+                  }else{
+                    if(this.pagedata){
+                      var splitdata = this.pagedata.split('&');
+                      // console.log(splitdata);
+                      var lastText = splitdata[splitdata.length-1];
+                      if(splitdata && lastText){
+                        if(lastText == 'b'){
+                          this.deliverCompanyId = splitdata[0];
+                          this.itemOrderNo = splitdata[1];
+                          this.fhQuantity = splitdata[2];
+                          this.fhCarTimes = splitdata[3];
+                          this.totalQuantity = splitdata[4];
+                          this.tpz = splitdata[5];
+                          this.tld = splitdata[6];
+                          this.receiveCompanyName = splitdata[7];
+                          this.receiverTel = splitdata[8];
+                          this.projectName = splitdata[9];
+                          this.projectAdd = splitdata[10];
+                          this.jzbw = splitdata[11];
+                          this.jzfs = splitdata[12];
+                          if(this.jzfs == '非泵' || this.jzfs == '自备泵'){
+                            this.pumpPrint = false;
+                            this.pumpTips = '非泵';
+                          }else{
+                            this.pumpPrint = true;
+                            this.pumpTips = '';
+                          }
+                          if(this.bigJzfs == 0){
+                            this.pumpPrint = true;
+                            this.pumpTips = '';
+                          }
+                          this.taskNo = splitdata[13];
+                          this.itemCreateTimeStamp = splitdata[14];
+                          this.carNumber = splitdata[15];
+                          this.carLisense = splitdata[16];
+                          this.driverName = splitdata[17]?decodeURI(splitdata[17]):'';
+                          this.remark = splitdata[18];
+                          this.qrstr = this.signQRprefix+splitdata[19];
+                          this.needprint = splitdata.length > 20 ? splitdata[20] : 1; // 1 要打印 0 不要打印
+                          this.fhy = splitdata.length > 21 ? decodeURI(splitdata[21]) : '';
+                          this.mixtable =  splitdata.length > 21 ? splitdata[22] : '';
+                          this.transportDistance = splitdata.length > 22 ? splitdata[23] : '';
+                          this.phbNo = splitdata.length > 23 ? splitdata[24] : '';
+                          this.deliverCompanyName = this.deliverNames[this.deliverCompanyId];
+                          if(this.itemCreateTimeStamp){
+                            this.itemCreateTime = this.timestampToTime(this.itemCreateTimeStamp);
+                          }
+                          returncode = 200
+                        }else if(lastText == 'a'){
+                          this.deliverCompanyId = splitdata[0];
+                          this.itemOrderNo = splitdata[1];
+                          this.fhQuantity = splitdata[2];
+                          this.fhCarTimes = splitdata[3];
+                          this.totalQuantity = splitdata[4];
+                          this.itemCreateTimeStamp = splitdata[5];
+
+                          this.driverName = splitdata[6] ? decodeURI(splitdata[6]) : '';
+                          this.remark = splitdata[7];
+                          this.qrstr = this.signQRprefix+splitdata[8];
+                          this.needprint =  splitdata[9];
+                          this.fhy = splitdata[10] ? decodeURI(splitdata[10]):'';
+                          this.mixtable =  splitdata[11];
+                          this.deliverCompanyName = this.deliverNames[this.deliverCompanyId];
+                          if(this.itemCreateTimeStamp){
+                            this.itemCreateTime = this.timestampToTime(this.itemCreateTimeStamp);
+                          }
+                          var taskId = splitdata[12];
+                          var vehicleId = splitdata[13];
+                          var taskcache = localStorage.getItem('taskcachedata');
+                          taskcache = JSON.parse(taskcache);
+                          var vehiclecache = localStorage.getItem('vehiclecachedata');
+                          vehiclecache = JSON.parse(vehiclecache);
+                          var taskdetail = taskcache ? taskcache['k_'+taskId] : '';
+                          var vehicledetail = vehiclecache ? vehiclecache['k_'+vehicleId]:'';
+                          if(!taskdetail || !vehicledetail){
+                            returncode = 509;
+                            return returncode;
+                          }
+                          this.tpz = taskdetail?taskdetail.data.tpz:'';
+                          this.tld = taskdetail?taskdetail.data.tld:'';
+                          this.receiveCompanyName = taskdetail?taskdetail.data.contractCompanyName:'';
+                          this.receiverTel = taskdetail?taskdetail.data.linkMan:'';
+                          this.projectName = taskdetail?taskdetail.data.projectName:'';
+                          this.projectAdd = taskdetail?taskdetail.data.projectAddress:'';
+                          this.jzbw = taskdetail?taskdetail.data.pouringPosition:'';
+                          this.jzfs = taskdetail?taskdetail.data.bsfs:'';
+                          if(this.jzfs == '非泵' || this.jzfs == '自备泵'){
+                            this.pumpPrint = false;
+                            this.pumpTips = '非泵';
+                          }else{
+                            this.pumpPrint = true;
+                            this.pumpTips = '';
+                          }
+                          if(this.bigJzfs == 0){
+                            this.pumpPrint = true;
+                            this.pumpTips = '';
+                          }
+                          this.taskNo = taskdetail?taskdetail.data.taskNo:'';
+                          this.carNumber = vehicledetail?vehicledetail.data.carNumber:'';
+                          this.carLisense = vehicledetail?vehicledetail.data.carLicenseNo:'';
+                          this.transportDistance = splitdata[14];
+                          this.phbNo = splitdata[15];
+                          returncode = 200
+                        }else{
+                          // 离线码数据错误
+                          returncode = 505;
+                        }
+                      }else{
+                        // 格式不正确
+                        returncode = 504;
+                      }
+                    }else{
+                      // 未识别到数据
+                      returncode = 503;
+                    }
+                  }
+                  return returncode;
+                },
+                timestampToTime:function(timestamp) {
+                  if(!timestamp){
+                      var date = new Date();
+                      var Y = date.getFullYear().toString().substr(2, 2) + '/';
+                      var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '/';
+                      var D = (date.getDate() < 10 ? '0'+date.getDate() : date.getDate()) + ' ';
+                      var h = (date.getHours()< 10 ? '0' + date.getHours() : date.getHours()) + ':';
+                      var m = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+                      var s = '';
+                  }else{
+                    var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+                    var Y = date.getFullYear() + '-';
+                    var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+                    var D = (date.getDate() < 10 ? '0'+date.getDate() : date.getDate()) + ' ';
+                    var h = (date.getHours()< 10 ? '0' + date.getHours() : date.getHours()) + ':';
+                    var m = (date.getMinutes()< 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+                    var s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+                  }
+
+                  return Y + M + D + h + m + s;
+                },
+                isInArray:function(arr,value){
+                  if(arr.length <= 0){
+                    return false;
+                  }
+                  for(var i = 0; i < arr.length; i++){
+                      if(value === arr[i]){
+                          return true;
+                      }
+                  }
+                  return false;
+                },
+                strInsert:function(str, length , joinstr) {
+                  var reg = new RegExp("\\S{" + length + "}", "g");
+                  var ma = str.match(reg);
+                  if(ma.length>0){
+                    return joinstr+ma.join(joinstr);
+                  }else{
+                    return '';
+                  }
+                },
+                handleInputStr:function(inputval){
+                  var self = this;
+                  var md5key = $.md5(inputval);
+                  var nowtimestamp = new Date().getTime();
+                  var originProcessedStr = localStorage.getItem('processedItems');
+                  if(originProcessedStr){
+                    originProcessedData = JSON.parse(originProcessedStr);
+                  }else{
+                    originProcessedData = {};
+                  }
+                  var processedTimeStamp = originProcessedData[md5key];
+                  // console.log(self.pageState);
+                  // console.log(originProcessedData);
+                  // console.log(md5key);
+                  // console.log(self.pageState);
+                  // if(!self.queue){
+                  //   self.queue = new Map();
+                  // }
+                  if(self.queue.get(md5key) || (processedTimeStamp && (nowtimestamp/1000-processedTimeStamp/1000 < 15)) || self.pageState != 0){
+                    if(processedTimeStamp && (nowtimestamp/1000-processedTimeStamp/1000 < 15)){
+                      originProcessedData[md5key] = nowtimestamp;
+                    }
+                    console.log('has exist');
+                    return;
+                  }else{
+                    self.queue.set(md5key,inputval);
+                  }
+                  setTimeout(() => {
+                    self.clearLocalStorage();
+                  }, 500);
+                  localStorage.setItem('processedItems',JSON.stringify(originProcessedData));
+                },
+                keydownListener:function(){
+                  var self = this;
+                  window.onkeydown = function(e){
+                    if(self.printerStatus != 1){
+                      return;
+                    }
+                    if(self.keyboardShow == 1){
+                      return;
+                    }
+
+                    if(self.queue.size == 0 && self.pageState == 0){
+                      self.errorMsg = '正在读取中...请稍后...';
+                    }else{
+                      self.errorMsg = '';
+                    }
+
+                    if(e.which == 13) {
+                      self.errorMsg = '';
+                      self.entercount++;
+                      self.inputcode = $("#testinput").val();
+                      var inputval = $("#testinput").val();
+                      //inputval = 'http://sign.mytongche.com/?id=VPITiIrfhFgCuTstBQ7swYDZUskgb5Z1NQoVFeGnIZU=';
+                      //inputval = 'http://sign.mytongche.com/?id=leYUpn2rcGIKdyZQbpsFWzU+6D7JBRvm/Dm4MHU2lH8=&code=111111';
+                      // inputval = 'http://sign.mytongche.com/?id=TsT8466&BK6462249558710&9.0&8&74.00&C55&100±30&江苏城南建设集团有限公司&还是 13645464646&伊美特（江苏）环保科技有限公司厂房&东定路东胜路&在你&非泵&35557&1584337432&沪A52002&沪A52002&测试勿动&&kl4eVeQVA&1&&TeT';
+                      //inputval = 'http://sign.mytongche.com/?id=TsT8682&BK0889255058498&12.0&15&118.0&1588929131&三一七&&q5xLgJrj&1&&&27257&1032&aTeT';
+                      $("#testinput").val('');
+
+                      if(inputval == 'test123'){
+                        // 打印测试页
+                        console.log(33)
+                        self.printtest = true;
+                        setTimeout(() => {
+                          window.print();
+                        }, 300);
+                        return;
+                      }
+
+                      if(self.authStatus == 1 && self.entercount > 0 && inputval.length > 5){
+                        if(inputval.substr(0,5) == 'reset' && inputval.length == 21){
+                          //reset
+                          if(self.pageState == 0){
+                            // do reset
+                            var data = {
+                                'clientId':self.clientId,
+                                'token' : self.token,
+                                'encodeStr':inputval
+                            };
+                            $.ajax(
+                            {
+                              url: self.apihost+self.api.reset,
+                              data: data,
+                              type: 'post',
+                              async: false,
+                              success: function(res){
+                                if(res.code == 200){
+                                  self.authStatus = 0;
+                                  self.tyhost = '';
+                                  self.clientName = '';
+                                  self.printerCompanyName = '';
+                                  localStorage.setItem('authStatus',0);
+                                  localStorage.setItem('taskcachedata',JSON.stringify({}));
+                                  localStorage.setItem('vehiclecachedata',JSON.stringify({}));
+                                  localStorage.setItem('drivercachedata',JSON.stringify({}));
+                                  localStorage.setItem('processedItems',JSON.stringify({}));
+                                }else{
+                                }
+                              },
+                              error: function(res){
+                              }
+                            });
+                          }
+                        }else{
+                          self.handleInputStr(inputval);
+                        }
+                      }else if(self.authStatus == 0){
+                        if(self.clientId){
+                          if(inputval && inputval.length < 10){
+                            var data = {
+                              'clientId':self.clientId,
+                              'encodeStr':inputval,
+                              'mode':self.dev
+                            }
+                            $.ajax(
+                            {
+                              url: self.apihost+self.api.register,
+                              data: data,
+                              type: 'post',
+                              success: function(res){
+                                if(res.code == 200){
+                                  self.authStatus = 1;
+                                  localStorage.setItem('authStatus',1);
+                                  self.serviceTel = res.result.serviceTel;
+                                  self.servicer = res.result.servicer;
+                                  self.deliverCompanyId = res.result.deliverCompanyId
+                                  self.driverpage = res.result.driverpage;
+                                  self.cgpage = res.result.cgpage;
+                                  self.cwpage = res.result.cwpage;
+                                  self.clientName = res.result.clientName;
+                                  self.printerCompanyName = res.result.printerCompanyName;
+                                  self.linkInfo = res.result.linkInfo;
+                                  self.showDistance = res.result.showDistance;
+                                  self.showPhbNo = res.result.showPhbNo;
+                                  self.muiltSign = res.result.muiltSign;
+                                  self.tyhost = res.result.tyhost;
+                                  var delivers = res.result.deliverNames;
+                                  delivers.forEach(function(v,k){
+                                    self.deliverNames[v.id] = v.name;
+                                  })
+                                  if(res.result.logo){
+                                    self.logo = res.result.logo;
+                                    localStorage.setItem('logo',res.result.logo);
+                                  }
+                                  if(res.result.bigTitle){
+                                    self.bigTitle = res.result.bigTitle;
+                                    localStorage.setItem('bigTitle',res.result.bigTitle);
+                                  }
+                                  if(res.result.subTitle){
+                                    self.subTitle = res.result.subTitle;
+                                    localStorage.setItem('subTitle',res.result.subTitle);
+                                  }
+                                  if(res.result.bottomName){
+                                    self.bottomName = res.result.bottomName;
+                                    localStorage.setItem('bottomName',res.result.bottomName);
+                                  }
+                                  if(res.result.bottomImg){
+                                    self.bottomImg = res.result.bottomImg;
+                                    localStorage.setItem('bottomImg',res.result.bottomImg);
+                                  }
+                                  if(res.result.qs){
+                                    self.qs = res.result.qs;
+                                    localStorage.setItem('qs',res.result.qs);
+                                  }
+                                  if(res.result.pumpPaperTitle){
+                                    self.pumpPaperTitle = res.result.pumpPaperTitle;
+                                    localStorage.setItem('pumpPaperTitle',res.result.pumpPaperTitle);
+                                  }
+                                  if(res.result.receivePaperTitle){
+                                    self.receivePaperTitle = res.result.receivePaperTitle;
+                                    localStorage.setItem('receivePaperTitle',res.result.receivePaperTitle);
+                                  }
+                                  if(res.result.mixPaperTitle){
+                                    self.mixPaperTitle = res.result.mixPaperTitle;
+                                    localStorage.setItem('mixPaperTitle',res.result.mixPaperTitle);
+                                  }
+                                  if(res.result.driverPaperTitle){
+                                    self.driverPaperTitle = res.result.driverPaperTitle;
+                                    localStorage.setItem('driverPaperTitle',res.result.driverPaperTitle);
+                                  }
+                                  if(res.result.cgPaperTitle){
+                                    self.cgPaperTitle = res.result.cgPaperTitle;
+                                    localStorage.setItem('cgPaperTitle',res.result.cgPaperTitle);
+                                  }
+                                  if(res.result.cwPaperTitle){
+                                    self.cwPaperTitle = res.result.cwPaperTitle;
+                                    localStorage.setItem('cwPaperTitle',res.result.cwPaperTitle);
+                                  }
+                                  localStorage.setItem('serviceTel',res.result.serviceTel);
+                                  localStorage.setItem('servicer',res.result.servicer);
+                                  if(res.result.token){
+                                    self.token = res.result.token;
+                                    localStorage.setItem('token',res.result.token);
+                                  }
+                                  self.printTempleType = res.result.printTempleType;
+                                  localStorage.setItem('printTempleType',res.result.printTempleType);
+                                  self.companyAddress = res.result.companyAddress;
+                                  localStorage.setItem('companyAddress',res.result.companyAddress);
+                                  self.footTip = res.result.footTip;
+                                  self.pagerSet = res.result.pagerSet;
+                                  self.allPagerSet = res.result.allPagerSet;
+                                  self.showQr = res.result.showQr;
+                                  self.bigJzfs = res.result.bigJzfs;
+                                  self.tpzTldSplit = res.result.tpzTldSplit;
+                                  self.contextOneLine = res.result.contextOneLine;
+                                  self.showCheckQr = res.result.showCheckQr;
+                                  // self.refresh();
+                                }else{
+
+                                }
+                              }
+                            });
+                          }
+                        }else{
+                          self.errorMsg = '打印机未获取到数据';
+                        }
+                      }
+                      return;
+                    }
+                  }
+                },
+                timeInterval:function(){
+                  var self = this;
+                  this.timeInterVal = setInterval(() => {
+                    self.timestr = self.getTimeShowStr();
+                  }, 50000);
+                },
+                getTimeShowStr:function(){
+                  var date = new Date();
+                  var sign1 = "-";
+                  var sign2 = ":";
+                  var year = date.getFullYear() // 年
+                  var month = date.getMonth() + 1; // 月
+                  var day  = date.getDate(); // 日
+                  var hour = date.getHours(); // 时
+                  var minutes = date.getMinutes(); // 分
+                  var seconds = date.getSeconds() //秒
+                  var weekArr = [ '周日','周一', '周二', '周三', '周四', '周五', '周六'];
+                  var week = weekArr[date.getDay()];
+                  // 给一位数数据前面加 “0”
+                  if (month >= 1 && month <= 9) {
+                    month = "0" + month;
+                  }
+                  if (day >= 0 && day <= 9) {
+                    day = "0" + day;
+                  }
+                  if (hour >= 0 && hour <= 9) {
+                    hour = "0" + hour;
+                  }
+                  if (minutes >= 0 && minutes <= 9) {
+                    minutes = "0" + minutes;
+                  }
+                  if (seconds >= 0 && seconds <= 9) {
+                    seconds = "0" + seconds;
+                  }
+                  return month + "月"  + day + "日 " + week + " " + hour + sign2 + minutes;
+                },
+                onChange:function(input) {
+                  var self = this;
+                  console.log(input)
+                 // document.querySelector(".input").value = input;
+                  self.checkStr = input;
+                  if(!navigator.onLine){
+                    self.keyboardMessage = '砼行终端目前是无网络状态，请关闭键盘，扫描二维码打票';
+                  }
+                  if(input != '{enter}' && input != '{bksp}'){
+                    if(self.checkStr.length > 8){
+                      self.keyboardMessage = '取件码输入过多';
+                    }
+                  }
+                },
+                onKeyPress:function(button) {
+                  var self = this;
+                  self.keyboardMessage = '';
+                  if(!navigator.onLine){
+                    self.keyboardMessage = '砼行终端目前是无网络状态，请关闭键盘，扫描二维码打票';
+                    return false;
+                  }
+                  if(button == '{enter}'){
+                    if(self.checkStr.length < 6 || self.checkStr.length > 8){
+                      self.keyboardMessage = '请输入正确的取件码';
+                      return false;
+                    }
+                    var data = {
+                      'clientId':self.clientId,
+                      'token':self.token,
+                      'checkStr':self.checkStr
+                    }
+                    $.ajax(
+                    {
+                      url: self.apihost+self.api.checkcode,
+                      data: data,
+                      type: 'post',
+                      success: function(res){
+                        if(res.code == 200 && res.result.qrStr){
+                          self.handleInputStr(res.result.qrStr);
+                          self.checkStr = '';
+                          document.querySelector(".input").value = '';
+                          // 收起键盘
+                          self.closeCodeBox();
+                        }else{
+                          self.keyboardMessage = res.message;
+                        }
+                      },
+                      error: function(res){
+                      }
+                    });
+                  }
+              },
+                test(){
+                    //this.apihost = "http://192.168.20.214"
+                }
+            },
+            mounted: function () {
+              var self = this;
+              let Keyboard = window.SimpleKeyboard.default;
+              let myKeyboard = new Keyboard({
+                onChange: input => self.onChange(input),
+                onKeyPress: button => self.onKeyPress(button),
+                layout: {
+                  default: ["1 2 3 {bksp}", "4 5 6 0", "7 8 9 {enter}"],
+                },
+                theme: "hg-theme-default hg-layout-numeric numeric-theme",
+                debug:true,
+                display: {
+                  '{bksp}': '←',
+                  '{enter}': '确认',
+                }
+              });
+              self.myKeyboard = myKeyboard;
+
+              window.onbeforeprint = function(e){
+                if(self.printInterval){
+                  clearInterval(self.printInterval);
+                }
+                if(!self.printtest){
+                  console.log(' before printing.');
+                  // self.printStatus = 2;
+                  self.loading = true;
+                }
+              };
+              window.onafterprint = function(e){
+                if(!self.printtest){
+                  console.log(' afterprinting.');
+                  self.loading = false;
+                  self.printCountDown();
+                  self.entercount = 0;
+                }else{
+                  self.printtest = false;
+                }
+              };
+              window.addEventListener("visibilitychange",()=>{
+                if(document.hidden && self.websocketSuccess && self.deliverCompanyId){
+                  $.ajax(
+                  {
+                    url: self.localhost+self.localapi.restart,
+                    data: {},
+                    type: 'get',
+                    success: function(res){
+                    },
+                    error: function(res){
+                    }
+                  });
+                }
+              });
+              $("#testinput").focus();
+              this.dev = this.getUrlKey("dev",window.location.href);
+
+              this.clientId = localStorage.getItem('clientId');
+              this.token = localStorage.getItem('token');
+              this.serviceTel = localStorage.getItem('serviceTel');
+              this.servicer = localStorage.getItem('servicer');
+              this.authStatus = localStorage.getItem('authStatus');
+              this.logo = localStorage.getItem('logo');
+              this.bigTitle = localStorage.getItem('bigTitle');
+              this.subTitle = localStorage.getItem('subTitle');
+              this.bottomName = localStorage.getItem('bottomName');
+              this.bottomImg = localStorage.getItem('bottomImg');
+              this.ver = localStorage.getItem('ver');
+              if(localStorage.getItem('qs')){
+                this.qs = localStorage.getItem('qs');
+              }
+              if(localStorage.getItem('pumpPaperTitle')){
+                this.pumpPaperTitle = localStorage.getItem('pumpPaperTitle');
+              }
+              if(localStorage.getItem('receivePaperTitle')){
+                this.receivePaperTitle = localStorage.getItem('receivePaperTitle');
+              }
+              if(localStorage.getItem('mixPaperTitle')){
+                this.mixPaperTitle = localStorage.getItem('mixPaperTitle');
+              }
+              if(localStorage.getItem('driverPaperTitle')){
+                this.driverPaperTitle = localStorage.getItem('driverPaperTitle');
+              }
+              if(localStorage.getItem('cgPaperTitle')){
+                this.cgPaperTitle = localStorage.getItem('cgPaperTitle');
+              }
+              if(localStorage.getItem('driverpage')){
+            	  this.driverpage = localStorage.getItem('driverpage');
+              }
+              if(localStorage.getItem('cgpage')){
+            	  this.cgpage = localStorage.getItem('cgpage');
+              }
+              if(localStorage.getItem('cwpage')){
+            	  this.cwpage = localStorage.getItem('cwpage');
+              }
+              this.auth();
+
+              this.keydownListener();
+              this.timestr = this.getTimeShowStr();
+              this.timeInterval();
+              this.handleState();
+              this.setAdvertiseInterval();
+              if(this.getUrlKey("testMax",window.location.href)){
+                this.testLocalStorage();
+              }
+              this.$nextTick(function () {
+                // Code that will run only after the
+                // entire view has been rendered      console.log(window.frames[0])
+                // test
+                // var patt = new RegExp(/(TsT(?!.*?TsT).*?TeT)+?/g);
+                // var matchstr = this.pagedata.match(patt);
+                // this.pagedata =  matchstr[0].slice(3,-3);
+                // this.analysisData();
+                // this.makeQrCode();
+
+                // this.printCountDownSecond = 15;
+
+                // setTimeout(() => {
+                //   this.print();
+                // }, 300);
+
+              })
+            },
+            created: function(){
+              this.initWebSocket();
+            },
+            beforeDestroy:function(){
+              //实例销毁前clear定时器
+              if(this.timeInterVal){
+                clearInterval(this.timeInterVal);
+              }
+              if(this.advertiseIntervalTimer){
+                clearInterval(this.advertiseIntervalTimer);
+              }
+              if(this.handleStateTimer){
+                clearTimeout(this.handleStateTimer);
+              }
+              if(this.keepaliveInterval){
+                clearInterval(this.keepaliveInterval);
+              }
+              clearInterval(this.printInterval);
+            },
+            destroyed() {
+              this.websocket.close() //离开路由之后断开websocket连接
+            }
+        })
+      </script>
+  </body>
+
+</html>

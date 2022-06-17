@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+  <html>
+    <head lang="en">
+      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>砼行_混凝土物流管理专家</title>
+      <link href="/img/favicon.ico" rel="shortcut icon" />
+      <link rel="stylesheet" href="css/print.css" rel="external nofollow" type="text/css" />
+      <script src="js/jquery-1.4.4.min.js"></script>
+      <script language="javascript" src="js/jquery.jqprint-0.3.js"></script>
+    </head>
+    <body style="background: #DBDBDB">
+      <div style="width: 100%">
+        <div id="steptitle1">
+          <div class="step">
+            <img src="images/step1.png">
+          </div>
+          <div class="steptext">
+            <div class="deviation title" style="padding-top: 45px;">进入小票详情页</div>
+            <div class="deviation title">页打开签收码</div>
+            <div class="deviation tip" style="padding-top: 20px;">如遇打印问题请咨询客服</div>
+            <div class="deviation tip">400-6800897</div>
+          </div>
+        </div>
+        <div id="steptitle2" style="display: none;">
+          <div class="step">
+            <img src="images/step2.png">
+          </div>
+          <div class="steptext">
+            <div class="deviation title" style="padding-top: 45px;">将二维码放入扫码区域</div>
+            <div class="deviation title"></div>
+            <div class="deviation tip" style="padding-top: 20px;">如遇打印问题请咨询客服</div>
+            <div class="deviation tip">400-6800897</div>
+          </div>
+        </div>
+        <div class="time">
+          <div class="deviation timebox">
+            <div><img src="images/time.png"></div>
+            <div id="Date" class="timetext"></div>
+          </div>
+        </div>
+        <div class="stepbody">
+          <img src="images/phone1.png" id="stepbody1">
+          <img src="images/phone2.png" id="stepbody2" style="display: none;">
+        </div>
+        <div>
+          <div class="deviation stepbottom">
+            <div class="text">• 上海建工集团自助打印系统</div>
+            <div class="img"><img src="images/bottom.png"></div>
+          </div>
+        </div>
+      </div>
+
+  <script language="javascript">
+      var s = 1;
+    //动态显示时间的js
+    setInterval(function(){
+      var date = new Date();
+      var sign1 = "-";
+      var sign2 = ":";
+      var year = date.getFullYear() // 年
+      var month = date.getMonth() + 1; // 月
+      var day  = date.getDate(); // 日
+      var hour = date.getHours(); // 时
+      var minutes = date.getMinutes(); // 分
+      var seconds = date.getSeconds() //秒
+      var weekArr = [ '周日','周一', '周二', '周三', '周四', '周五', '周六'];
+      var week = weekArr[date.getDay()];
+      // 给一位数数据前面加 “0”
+      if (month >= 1 && month <= 9) {
+        month = "0" + month;
+      }
+      if (day >= 0 && day <= 9) {
+        day = "0" + day;
+      }
+      if (hour >= 0 && hour <= 9) {
+        hour = "0" + hour;
+      }
+      if (minutes >= 0 && minutes <= 9) {
+        minutes = "0" + minutes;
+      }
+      if (seconds >= 0 && seconds <= 9) {
+        seconds = "0" + seconds;
+      }
+      $("#Date").html(month + "月"  + day + "日 " + week + " " + hour + sign2 + minutes);
+      if (s % 5 == 0) {
+        if ( $("#steptitle1").css("display")=='none' ) {
+          $("#steptitle2").fadeOut(function(){
+            $("#steptitle1").fadeIn();
+          });
+          $("#stepbody2").fadeOut(function(){
+            $("#stepbody1").fadeIn();
+          });
+        } else {
+          $("#steptitle1").fadeOut(function(){
+            $("#steptitle2").fadeIn();
+          });
+          $("#stepbody1").fadeOut(function(){
+            $("#stepbody2").fadeIn();
+          });
+        }
+      }
+
+      s++;
+    },1000);
+
+  </script>
+</body>
+
+</html>
